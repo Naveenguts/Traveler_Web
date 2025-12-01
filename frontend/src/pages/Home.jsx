@@ -5,8 +5,7 @@ import DestinationCard from '../components/DestinationCard';
 const popularDestinations = [
   { id: 1, name: 'Paris', description: 'City of Lights', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1200&auto=format&fit=crop' },
   { id: 2, name: 'Bali', description: 'Island of the Gods', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop' },
-  { id: 3, name: 'London', description: 'Historic and Modern', image: 'https://images.unsplash.com/photo-1462804993656-fac4ff489837?q=80&w=1200&auto=format&fit=crop' },
-  { id: 4, name: 'Dubai', description: 'City of Gold', image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1200&auto=format&fit=crop' },
+  { id: 3, name: 'Dubai', description: 'City of Gold', image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1200&auto=format&fit=crop' },
 ];
 
 const Home = () => {
