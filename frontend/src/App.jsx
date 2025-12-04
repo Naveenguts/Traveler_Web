@@ -10,6 +10,8 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import AboutUs from './pages/AboutUs';
+import Contacts from './pages/Contacts';
 
 const App = () => {
   return (
@@ -20,6 +22,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/destinations/:id" element={<DestinationDetails />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contacts" element={<Contacts />} />
+          
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
