@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import AboutUs from './pages/AboutUs';
 import Contacts from './pages/Contacts';
+import ErrorMessage from './pages/ErrorMessage';
 
 const App = () => {
   return (
@@ -29,6 +30,8 @@ const App = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
+          
+          <Route path="*" element={<ErrorMessage />} />
         </Routes>
       </main>
       <Footer />
