@@ -9,7 +9,7 @@ const ErrorMessage = () => {
     setShowToast(true);
     setTimeout(() => {
       navigate('/');
-    }, 1500);
+    }, 500);
   };
 
   return (
@@ -19,18 +19,41 @@ const ErrorMessage = () => {
           Redirecting to Home Page...
         </div>
       )}
-      <div className="error-container">
-        <h1 className="error-code">404</h1>
-        <h2 className="error-title">Page Not Found</h2>
-        <p className="error-message">
-          Oops! The page you're looking for doesn't exist or the URL is incorrect.
-        </p>
-        <button 
-          className="error-btn" 
-          onClick={handleGoHome}
-        >
-          Go Back Home
-        </button>
+      <div className="error-header">
+        <h1 className="page-title">Page Not Found</h1>
+      </div>
+
+      <div className="error-content">
+        <div className="error-left">
+          <div className="error-code-container">
+            <h1 className="error-code">404</h1>
+          </div>
+          <h2 className="error-main-title">We're sorry – we can't find the page you requested.</h2>
+          <p className="error-subtitle">
+            We have recently made some changes to our site, and the page you are looking for can no longer be found.
+          </p>
+
+          <p className="error-hint">
+            Please check the URL and enter the correct path to continue browsing.
+          </p>
+
+          <button 
+            className="error-btn" 
+            onClick={handleGoHome}
+          >
+            Back to Home
+          </button>
+        </div>
+
+        <div className="error-right">
+          <div className="error-image-container">
+            <img 
+              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=600&fit=crop"
+              alt="Beautiful travel destination"
+              className="error-image"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
