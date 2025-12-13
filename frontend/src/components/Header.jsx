@@ -70,13 +70,11 @@ const ProfileDropdown = () => {
 
           <div className="dropdown-items">
             <button onClick={() => handleMenuClick('/')}>Home</button>
-            <button onClick={() => handleMenuClick('/my-applications')}>My Applications</button>
-            <button onClick={() => handleMenuClick('/my-bookmarks')}>My Bookmarks</button>
-            <button onClick={() => handleMenuClick('/edit-resume')}>Edit Resume</button>
-            <button onClick={() => handleMenuClick('/edit-preferences')}>Edit Preferences</button>
-            <button onClick={() => handleMenuClick('/safety-tips')}>Safety Tips</button>
-            <button onClick={() => handleMenuClick('/help-center')}>Help Center</button>
-            <button onClick={() => setIsOpen(!isOpen)}>More ▼</button>
+            <button onClick={() => handleMenuClick('/my-trips')}>My Trips</button>
+            <button onClick={() => handleMenuClick('/wishlist')}>Wishlist</button>
+            <button onClick={() => handleMenuClick('/blog')}>Blog</button>
+            <button onClick={() => handleMenuClick('/support')}>Support & Info</button>
+            <button onClick={() => handleMenuClick('/settings')}>Settings</button>
             <button onClick={handleLogout} style={{ color: '#ef4444', fontWeight: '600' }}>
               Logout
             </button>
