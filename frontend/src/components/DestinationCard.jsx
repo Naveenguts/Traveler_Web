@@ -1,10 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import WishlistButton from './WishlistButton';
 
 const DestinationCard = ({ destination }) => {
   return (
     <div className="destination-card">
-      <img src={destination.image} alt={destination.name} />
+      <div className="destination-card-image">
+        <img src={destination.image} alt={destination.name} />
+        <div className="wishlist-overlay">
+          <WishlistButton destination={destination} />
+        </div>
+      </div>
       <div className="destination-card-content">
         <h3>{destination.name}</h3>
         {destination.country && <p className="destination-country">📍 {destination.country}</p>}
@@ -32,3 +38,4 @@ const DestinationCard = ({ destination }) => {
 };
 
 export default DestinationCard;
+

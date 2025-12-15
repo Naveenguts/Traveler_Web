@@ -2,6 +2,63 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const NotificationBell = () => {
+  const { notifications = [], markNotificationRead, markAllNotificationsRead, clearNotifications } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const bellRef = useRef(null);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (bellRef.current && !bellRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="notification-bell" ref={bellRef}>
+      <button className="bell-button" onClick={() => setIsOpen((prev) => !prev)} aria-label="Notifications">
+        <svg className="bell-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a5 5 0 0 0-5 5v3.382l-.947 1.58A1 1 0 0 0 6.885 15h10.23a1 1 0 0 0 .832-1.538L17 11.382V8a5 5 0 0 0-5-5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+        {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
+      </button>
+
+      {isOpen && (
+        <div className="notification-panel">
+          <div className="panel-header">
+            <span>Notifications</span>
+            <div className="panel-actions">
+              <button onClick={markAllNotificationsRead} disabled={notifications.length === 0}>Mark all read</button>
+              <button onClick={clearNotifications} disabled={notifications.length === 0}>Clear</button>
+            </div>
+          </div>
+          <div className="panel-list">
+            {notifications.length === 0 ? (
+              <p className="empty-state">No notifications yet.</p>
+            ) : (
+              notifications.slice(0, 8).map((n) => (
+                <div key={n.id} className={`panel-item ${n.read ? 'read' : ''}`} onClick={() => markNotificationRead(n.id)}>
+                  <div className="panel-item-top">
+                    <span className="item-dot" aria-hidden="true" />
+                    <span className="item-message">{n.message}</span>
+                  </div>
+                  <span className="item-date">{new Date(n.date).toLocaleString()}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
@@ -72,7 +129,10 @@ const ProfileDropdown = () => {
             <button onClick={() => handleMenuClick('/')}>Home</button>
             <button onClick={() => handleMenuClick('/my-trips')}>My Trips</button>
             <button onClick={() => handleMenuClick('/wishlist')}>Wishlist</button>
-            <button onClick={() => handleMenuClick('/blog')}>Blog</button>
+            <button onClick={() => handleMenuClick('/blogs/write')} style={{ color: '#2563eb', fontWeight: '700' }}>
+              ✍️ Write Blog
+            </button>
+            <button onClick={() => handleMenuClick('/blogs')}>Blog</button>
             <button onClick={() => handleMenuClick('/support')}>Support & Info</button>
             <button onClick={() => handleMenuClick('/settings')}>Settings</button>
             <button onClick={handleLogout} style={{ color: '#ef4444', fontWeight: '600' }}>
@@ -101,7 +161,10 @@ const Header = () => {
       </div>
       <div className="header-right">
         {user ? (
-          <ProfileDropdown />
+          <>
+            <NotificationBell />
+            <ProfileDropdown />
+          </>
         ) : (
           <Link to="/login" className="btn btn-login">Login</Link>
         )}
