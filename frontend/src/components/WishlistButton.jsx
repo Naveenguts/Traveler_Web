@@ -23,7 +23,7 @@ const WishlistButton = ({ destination }) => {
       className={`wishlist-button ${inWishlist ? 'active' : ''}`}
       title={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
     >
-      <span className="heart-icon">♥</span>
+      <span className="star-icon">★</span>
     </button>
   );
 };

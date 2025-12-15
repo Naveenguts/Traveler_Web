@@ -101,12 +101,18 @@ const StarRating = ({ rating, onRatingChange, readonly = false }) => {
 
 const DestinationDetails = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, addTrip } = useAuth();
   const destination = destinationsData.find(dest => dest.id === parseInt(id));
   
   const [reviews, setReviews] = useState(initialReviews[parseInt(id)] || []);
   const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    startDate: '',
+    endDate: '',
+    description: ''
+  });
 
   if (!destination) return <p>Destination not found!</p>;
 
@@ -145,6 +151,37 @@ const DestinationDetails = () => {
     setReviews([review, ...reviews]);
     setNewReview({ rating: 0, comment: '' });
     setShowReviewForm(false);
+  };
+
+  const handleBookTrip = (e) => {
+    e.preventDefault();
+    
+    if (!user) {
+      alert('Please login to book a trip');
+      return;
+    }
+
+    if (!bookingData.startDate || !bookingData.endDate) {
+      alert('Please select travel dates');
+      return;
+    }
+
+    const trip = addTrip({
+      destinationName: destination.name,
+      country: `${destination.country}`,
+      startDate: bookingData.startDate,
+      endDate: bookingData.endDate,
+      description: bookingData.description || `Trip to ${destination.name}`,
+      coverImage: destination.image,
+      price: destination.price,
+      duration: destination.duration
+    });
+
+    setShowBookingModal(false);
+    setBookingData({ startDate: '', endDate: '', description: '' });
+    
+    // Optional: Navigate to my trips page
+    // navigate('/my-trips');
   };
 
   return (
@@ -186,6 +223,13 @@ const DestinationDetails = () => {
                 </div>
               </div>
             </div>
+
+            <button 
+              className="btn btn-book-trip"
+              onClick={() => setShowBookingModal(true)}
+            >
+              ✈️ Book This Trip
+            </button>
           </div>
 
           {/* Reviews Section */}
@@ -255,6 +299,64 @@ const DestinationDetails = () => {
                       <StarRating rating={review.rating} readonly={true} />
                     </div>
                     <p className="review-comment">{review.comment}</p>
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <div className="modal-overlay" onClick={() => setShowBookingModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Book Your Trip to {destination.name}</h2>
+              <button className="modal-close" onClick={() => setShowBookingModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleBookTrip} className="booking-form">
+              <div className="form-group">
+                <label htmlFor="start-date">Start Date</label>
+                <input
+                  type="date"
+                  id="start-date"
+                  value={bookingData.startDate}
+                  onChange={(e) => setBookingData({ ...bookingData, startDate: e.target.value })}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="end-date">End Date</label>
+                <input
+                  type="date"
+                  id="end-date"
+                  value={bookingData.endDate}
+                  onChange={(e) => setBookingData({ ...bookingData, endDate: e.target.value })}
+                  min={bookingData.startDate || new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="trip-description">Trip Description (Optional)</label>
+                <textarea
+                  id="trip-description"
+                  rows="3"
+                  placeholder="Add notes about your trip..."
+                  value={bookingData.description}
+                  onChange={(e) => setBookingData({ ...bookingData, description: e.target.value })}
+                />
+              </div>
+              <div className="booking-summary">
+                <p><strong>Price:</strong> ${destination.price}</p>
+                <p><strong>Duration:</strong> {destination.duration} days (suggested)</p>
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowBookingModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Confirm Booking
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
                   </div>
                 ))
               )}

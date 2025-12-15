@@ -11,6 +11,7 @@ import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import WriteBlog from './pages/WriteBlog';
 import Wishlist from './pages/Wishlist';
+import MyTrips from './pages/MyTrips';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Login from './pages/Login';
@@ -35,6 +36,7 @@ const App = () => {
           <Route path="/blogs/write" element={<WriteBlog />} />
           <Route path="/blogs/:id" element={<BlogDetail />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contacts" element={<Contacts />} />
           
