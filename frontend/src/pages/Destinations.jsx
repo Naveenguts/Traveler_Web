@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/Destinations.css';
 import DestinationCard from '../components/DestinationCard';
 
 const destinationsData = [
@@ -189,7 +190,7 @@ const Destinations = () => {
               <option value="">All Durations</option>
               <option value="short">Short (≤5 days)</option>
               <option value="medium">Medium (6-8 days)</option>
-              <option value="long">Long (8 days)</option>
+              <option value="long">Long (≥9 days)</option>
             </select>
           </div>
 
@@ -243,10 +244,13 @@ const Destinations = () => {
             <DestinationCard key={dest.id} destination={dest} />
           ))
         ) : (
-          <div className="no-results">
-            <p>No destinations found matching your criteria</p>
-            <p className="suggestion">Try adjusting your filters or search terms</p>
-            <button className="btn" onClick={clearFilters}>Reset Filters</button>
+          <div className="no-results-card" role="status" aria-live="polite">
+            <div className="no-results-icon" aria-hidden="true">🧭</div>
+            <h4 className="no-results-title">No destinations match your filters</h4>
+            <p className="no-results-text">Try broadening the search or clearing filters to discover more places.</p>
+            <div className="no-results-actions">
+              <button className="btn-primary" onClick={clearFilters}>Reset Filters</button>
+            </div>
           </div>
         )}
       </div>

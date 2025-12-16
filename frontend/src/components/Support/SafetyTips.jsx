@@ -62,7 +62,21 @@ const SafetyTips = () => {
       <div className="help-card" style={{ marginTop: '2rem' }}>
         <h3>Emergency Support</h3>
         <p>If you're in an emergency situation while traveling, contact local authorities first, then reach out to our 24/7 emergency hotline.</p>
-        <button className="btn btn-primary">Emergency Hotline: 1-800-HELP-NOW</button>
+        <button
+          className="btn btn-primary"
+          aria-label="Call emergency hotline 1-800-HELP-NOW"
+          onClick={() => {
+            try {
+              // Attempt to open phone dialer
+              window.location.href = 'tel:+18004357669';
+            } catch (_) {
+              // Fallback: show the number clearly
+              alert('Emergency Hotline: 1-800-HELP-NOW');
+            }
+          }}
+        >
+          Emergency Hotline: 1-800-HELP-NOW
+        </button>
       </div>
     </div>
   );

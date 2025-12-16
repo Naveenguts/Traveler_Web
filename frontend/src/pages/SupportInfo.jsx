@@ -10,7 +10,7 @@ const SupportInfo = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'help':
-        return <HelpCenter />;
+        return <HelpCenter onContactClick={() => setActiveTab('contact')} />;
       case 'contact':
         return <ContactSupport />;
       case 'safety':

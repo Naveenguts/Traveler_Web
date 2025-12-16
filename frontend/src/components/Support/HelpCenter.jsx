@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const HelpCenter = () => {
+const HelpCenter = ({ onContactClick }) => {
   const [openFaq, setOpenFaq] = useState(null);
 
   const faqs = [
@@ -62,7 +62,13 @@ const HelpCenter = () => {
       <div className="help-card">
         <h3>Still need help?</h3>
         <p>Our support team is available 24/7 to assist you.</p>
-        <button className="btn btn-primary">Contact Support</button>
+        <button
+          className="btn btn-primary"
+          onClick={onContactClick}
+          aria-label="Contact Support"
+        >
+          Contact Support
+        </button>
       </div>
     </div>
   );
