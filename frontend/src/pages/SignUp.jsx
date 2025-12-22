@@ -8,20 +8,44 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Signing up with:', { name, email, password });
-    
-    // Set user data in context after signup
-    login({
-      name: name,
-      email: email
-    });
-    
-    // Navigate to home after successful signup
-    navigate('/');
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Store token and user data in context
+        login({
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          preferences: data.user.preferences,
+          token: data.token
+        });
+        navigate('/');
+      } else {
+        setError(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      console.error('Sign up error:', err);
+      setError('Network error. Please make sure the server is running.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,7 +85,11 @@ const SignUp = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-login">Create Account</button>
+        {error && <p className="error">{error}</p>}
+
+        <button type="submit" className="btn btn-login" disabled={loading}>
+          {loading ? 'Creating Account...' : 'Create Account'}
+        </button>
         
         <p className="create-account">
           Already have account? <Link to="/login" className="text-accent">click here</Link>

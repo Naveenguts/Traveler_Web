@@ -8,20 +8,42 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    // Simple mock validation
-    if (email === 'user@example.com' && password === 'password123') {
-      // Set user data in context
-      login({
-        name: 'Naveen Kumar S',
-        email: email
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
-      navigate('/');
-    } else {
-      setError('Invalid email or password');
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Store token and user data in context
+        login({
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          preferences: data.user.preferences,
+          token: data.token
+        });
+        navigate('/');
+      } else {
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Network error. Please make sure the server is running.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +75,9 @@ const Login = () => {
 
         {error && <p className="error">{error}</p>}
 
-        <button type="submit" className="btn btn-login">Login</button>
+        <button type="submit" className="btn btn-login" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
         
         <p className="create-account">
           Create an account? <Link to="/signup" className="text-accent">click here</Link>

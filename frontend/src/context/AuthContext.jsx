@@ -13,14 +13,33 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
+  const [token, setToken] = useState(() => {
+    // Load token from localStorage if present
+    try {
+      return localStorage.getItem("traveler_token") || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const login = (userData) => {
     setUser(userData);
-    try { localStorage.setItem("traveler_user", JSON.stringify(userData)); } catch (e) {}
+    if (userData.token) {
+      setToken(userData.token);
+      localStorage.setItem("traveler_token", userData.token);
+    }
+    try { 
+      localStorage.setItem("traveler_user", JSON.stringify(userData)); 
+    } catch (e) {}
   };
 
   const logout = () => {
     setUser(null);
-    try { localStorage.removeItem("traveler_user"); } catch (e) {}
+    setToken(null);
+    try { 
+      localStorage.removeItem("traveler_user");
+      localStorage.removeItem("traveler_token");
+    } catch (e) {}
   };
 
   const updateUser = (updates) => {
@@ -159,7 +178,14 @@ export const AuthProvider = ({ children }) => {
     
     setTripsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/trips/user/${user.id}`);
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_URL}/trips/user/${user.id}`, { headers });
       const data = await response.json();
       if (data.success) {
         setTrips(data.trips);
@@ -196,9 +222,16 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/trips`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           userId: user.id,
           ...tripData,
@@ -236,9 +269,16 @@ export const AuthProvider = ({ children }) => {
 
   const updateTrip = async (tripId, updates) => {
     try {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/trips/${tripId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(updates)
       });
 
@@ -262,8 +302,14 @@ export const AuthProvider = ({ children }) => {
 
   const cancelTrip = async (tripId) => {
     try {
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/trips/${tripId}/cancel`, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers
       });
 
       const data = await response.json();
@@ -288,8 +334,14 @@ export const AuthProvider = ({ children }) => {
 
   const deleteTrip = async (tripId) => {
     try {
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/trips/${tripId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers
       });
 
       const data = await response.json();

@@ -17,9 +17,11 @@ mongoose.connect(MONGODB_URI)
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes
+const authRoutes = require('./routes/auth');
 const destinationRoutes = require('./routes/destinations');
 const tripRoutes = require('./routes/trips');
 
+app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/trips', tripRoutes);
 
@@ -38,6 +40,7 @@ app.get('/', (req, res) => {
     message: 'Welcome to Traveler API',
     version: '1.0.0',
     endpoints: {
+      auth: '/api/auth',
       destinations: '/api/destinations',
       trips: '/api/trips',
       health: '/api/health'
