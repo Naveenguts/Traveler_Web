@@ -13,6 +13,17 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+// Disable caching for all responses
+app.use((req, res, next) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'ETag': 'none'
+  });
+  next();
+});
+
 // Routes
 const authRoutes = require('./routes/auth');
 const destinationRoutes = require('./routes/destinations');
@@ -57,9 +68,16 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ 
+  res.status(404);
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
+  res.json({ 
     success: false, 
-    message: 'Route not found' 
+    message: 'Route not found',
+    statusCode: 404
   });
 });
 
