@@ -61,20 +61,14 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
     success: false, 
-    message: 'Something went wrong!', 
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+    message: 'Something went wrong!',
+    statusCode: 500
   });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404);
-  res.set({
-    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0'
-  });
-  res.json({ 
+  res.status(404).json({ 
     success: false, 
     message: 'Route not found',
     statusCode: 404
