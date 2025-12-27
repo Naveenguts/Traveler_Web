@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import AlertContainer from './components/AlertContainer';
 import './App.css';
+import './styles/AboutUs.css';
 import Home from './pages/Home';
 import Destinations from './pages/Destinations';
 import DestinationDetails from './pages/DestinationDetails';
