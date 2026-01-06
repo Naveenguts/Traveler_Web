@@ -3546,6 +3546,12 @@ footer.footer {
   gap: 2rem;
 }
 
+.settings-status {
+  grid-column: 1 / -1;
+  color: #0f172a;
+  font-weight: 600;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -3609,6 +3615,10 @@ footer.footer {
   margin-bottom: 2rem;
 }
 
+.payment-alert {
+  margin-bottom: 1rem;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3617,8 +3627,18 @@ footer.footer {
 
 .payment-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.payment-list .empty-state {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
 .payment-card {

@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const AccountSettings = () => {
-  const { user } = useAuth();
+  const { user, token, apiUrl, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '+1 234 567 8900',
-    dateOfBirth: '1990-01-15'
+    phone: user?.phone || '',
+    dateOfBirth: user?.dateOfBirth ? user.dateOfBirth.substring(0, 10) : ''
   });
+  const [status, setStatus] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      dateOfBirth: user?.dateOfBirth ? user.dateOfBirth.substring(0, 10) : ''
+    });
+  }, [user?.name, user?.email, user?.phone, user?.dateOfBirth]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,9 +30,45 @@ const AccountSettings = () => {
     }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    alert('Account settings updated successfully!');
+  const handleSave = async () => {
+    if (!token) {
+      setStatus('Please log in again to update your profile.');
+      return;
+    }
+    setSaving(true);
+    setStatus('');
+    try {
+      const res = await fetch(`${apiUrl}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          preferences: user?.preferences,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth || null
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || 'Unable to update profile');
+      }
+      updateUser({
+        name: data.user.name,
+        email: data.user.email,
+        preferences: data.user.preferences,
+        phone: data.user.phone,
+        dateOfBirth: data.user.dateOfBirth
+      });
+      setIsEditing(false);
+      setStatus('Profile updated and saved.');
+    } catch (err) {
+      setStatus(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -86,10 +133,12 @@ const AccountSettings = () => {
         </div>
 
         {isEditing && (
-          <button className="btn btn-primary" onClick={handleSave}>
-            Save Changes
+          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Changes'}
           </button>
         )}
+
+        {status && <p className="settings-status">{status}</p>}
       </div>
     </div>
   );

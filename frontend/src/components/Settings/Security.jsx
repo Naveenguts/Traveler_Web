@@ -1,21 +1,69 @@
-  import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Security = () => {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [qrCode, setQrCode] = useState('');
+  const [otp, setOtp] = useState('');
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
   const [securitySettings, setSecuritySettings] = useState({
-    twoFactorEnabled: true,
+    twoFAEnabled: false,
     loginAlerts: true,
-    trustedDevices: [
-      { id: 1, device: 'Chrome on Windows', lastLogin: '2024-12-13', location: 'New York, USA' },
-      { id: 2, device: 'Safari on iPhone', lastLogin: '2024-12-12', location: 'New York, USA' }
-    ]
+    trustedDevices: []
   });
+  const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState('');
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  useEffect(() => {
+    fetchSecuritySettings();
+    fetchTrustedDevices();
+  }, []);
+
+  const getAuthToken = () => localStorage.getItem('token');
+
+  const showMessage = (text, type = 'success') => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: '', type: '' }), 5000);
+  };
+
+  const fetchSecuritySettings = async () => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.get(`${API_URL}/security/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSecuritySettings(prev => ({
+        ...prev,
+        twoFAEnabled: response.data.twoFAEnabled,
+        loginAlerts: response.data.loginAlerts
+      }));
+    } catch (error) {
+      console.error('Error fetching security settings:', error);
+    }
+  };
+
+  const fetchTrustedDevices = async () => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.get(`${API_URL}/security/devices`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSecuritySettings(prev => ({
+        ...prev,
+        trustedDevices: response.data.devices
+      }));
+    } catch (error) {
+      console.error('Error fetching trusted devices:', error);
+    }
+  };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -38,41 +86,185 @@ const Security = () => {
     }
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      alert('Please fill in all password fields');
+      showMessage('Please fill in all password fields', 'error');
       return;
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+      showMessage('New passwords do not match', 'error');
       return;
     }
 
-    if (passwordData.newPassword.length < 8) {
-      alert('Password must be at least 8 characters long');
+    if (passwordData.newPassword.length < 6) {
+      showMessage('Password must be at least 6 characters long', 'error');
       return;
     }
 
-    alert('Password changed successfully!');
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    setShowPasswordForm(false);
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${API_URL}/security/change-password`,
+        {
+          oldPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      showMessage(response.data.message, 'success');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setShowPasswordForm(false);
+
+      // If requires relogin, logout user
+      if (response.data.requiresRelogin) {
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }, 2000);
+      }
+    } catch (error) {
+      showMessage(error.response?.data?.message || 'Failed to change password', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleToggle2FA = () => {
-    setSecuritySettings(prev => ({
-      ...prev,
-      twoFactorEnabled: !prev.twoFactorEnabled
-    }));
-    alert('Two-factor authentication ' + (securitySettings.twoFactorEnabled ? 'disabled' : 'enabled'));
+  const handleSetup2FA = async () => {
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${API_URL}/security/2fa/setup`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setQrCode(response.data.qrCode);
+      setShow2FASetup(true);
+      showMessage('Scan the QR code with your authenticator app', 'success');
+    } catch (error) {
+      showMessage(error.response?.data?.message || 'Failed to setup 2FA', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRemoveDevice = (id) => {
-    setSecuritySettings(prev => ({
-      ...prev,
-      trustedDevices: prev.trustedDevices.filter(device => device.id !== id)
-    }));
-    alert('Device removed from trusted devices');
+  const handleVerify2FA = async () => {
+    if (!otp || otp.length !== 6) {
+      showMessage('Please enter a valid 6-digit OTP', 'error');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${API_URL}/security/2fa/verify`,
+        { otp },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      showMessage(response.data.message, 'success');
+      setSecuritySettings(prev => ({ ...prev, twoFAEnabled: true }));
+      setShow2FASetup(false);
+      setQrCode('');
+      setOtp('');
+    } catch (error) {
+      showMessage(error.response?.data?.message || 'Invalid OTP', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    const password = prompt('Enter your password to disable 2FA:');
+    if (!password) return;
+
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${API_URL}/security/2fa/disable`,
+        { password },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      showMessage(response.data.message, 'success');
+      setSecuritySettings(prev => ({ ...prev, twoFAEnabled: false }));
+    } catch (error) {
+      showMessage(error.response?.data?.message || 'Failed to disable 2FA', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleLoginAlerts = async () => {
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const newState = !securitySettings.loginAlerts;
+      await axios.put(
+        `${API_URL}/security/login-alerts`,
+        { enabled: newState },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setSecuritySettings(prev => ({
+        ...prev,
+        loginAlerts: newState
+      }));
+      showMessage(`Login alerts ${newState ? 'enabled' : 'disabled'}`, 'success');
+    } catch (error) {
+      showMessage('Failed to update login alerts', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveDevice = async (deviceId) => {
+    if (!confirm('Are you sure you want to remove this device?')) return;
+
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      await axios.delete(`${API_URL}/security/devices/${deviceId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setSecuritySettings(prev => ({
+        ...prev,
+        trustedDevices: prev.trustedDevices.filter(device => device._id !== deviceId)
+      }));
+      showMessage('Device removed successfully', 'success');
+    } catch (error) {
+      showMessage('Failed to remove device', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -81,6 +273,13 @@ const Security = () => {
         <h2>Security & Password</h2>
       </div>
 
+      {/* Message Alert */}
+      {message.text && (
+        <div className={`alert alert-${message.type}`}>
+          {message.text}
+        </div>
+      )}
+
       {/* Change Password Section */}
       <div className="security-section">
         <div className="section-header">
@@ -88,6 +287,7 @@ const Security = () => {
           <button 
             className="btn-edit"
             onClick={() => setShowPasswordForm(!showPasswordForm)}
+            disabled={loading}
           >
             {showPasswordForm ? 'Cancel' : 'Change Password'}
           </button>
@@ -103,6 +303,7 @@ const Security = () => {
                 placeholder="Enter your current password"
                 value={passwordData.currentPassword}
                 onChange={handlePasswordChange}
+                disabled={loading}
               />
             </div>
 
@@ -111,9 +312,10 @@ const Security = () => {
               <input
                 type="password"
                 name="newPassword"
-                placeholder="Enter new password"
+                placeholder="Enter new password (min 6 characters)"
                 value={passwordData.newPassword}
                 onChange={handlePasswordChange}
+                disabled={loading}
               />
               {passwordData.newPassword && (
                 <div className={`password-strength ${passwordStrength.toLowerCase()}`}>
@@ -130,11 +332,16 @@ const Security = () => {
                 placeholder="Confirm new password"
                 value={passwordData.confirmPassword}
                 onChange={handlePasswordChange}
+                disabled={loading}
               />
             </div>
 
-            <button className="btn btn-primary" onClick={handleChangePassword}>
-              Update Password
+            <button 
+              className="btn btn-primary" 
+              onClick={handleChangePassword}
+              disabled={loading}
+            >
+              {loading ? 'Updating...' : 'Update Password'}
             </button>
           </div>
         )}
@@ -145,17 +352,62 @@ const Security = () => {
         <div className="section-header">
           <h3>Two-Factor Authentication</h3>
           <button 
-            className={`btn ${securitySettings.twoFactorEnabled ? 'btn-danger' : 'btn-success'}`}
-            onClick={handleToggle2FA}
+            className={`btn ${securitySettings.twoFAEnabled ? 'btn-danger' : 'btn-success'}`}
+            onClick={securitySettings.twoFAEnabled ? handleDisable2FA : handleSetup2FA}
+            disabled={loading}
           >
-            {securitySettings.twoFactorEnabled ? 'Disable' : 'Enable'}
+            {securitySettings.twoFAEnabled ? 'Disable' : 'Enable'}
           </button>
         </div>
         <p className="section-desc">
-          {securitySettings.twoFactorEnabled 
+          {securitySettings.twoFAEnabled 
             ? '✓ Two-factor authentication is enabled. Your account is protected with an extra layer of security.'
             : 'Two-factor authentication is disabled. Enable it for better security.'}
         </p>
+
+        {/* 2FA Setup Modal */}
+        {show2FASetup && (
+          <div className="twofa-setup">
+            <h4>Setup Two-Factor Authentication</h4>
+            <p>Scan this QR code with Google Authenticator or Authy:</p>
+            {qrCode && (
+              <div className="qr-code-container">
+                <img src={qrCode} alt="2FA QR Code" />
+              </div>
+            )}
+            <div className="form-group">
+              <label>Enter the 6-digit code from your app:</label>
+              <input
+                type="text"
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength="6"
+                disabled={loading}
+                style={{ textAlign: 'center', fontSize: '24px', letterSpacing: '8px' }}
+              />
+            </div>
+            <button 
+              className="btn btn-primary" 
+              onClick={handleVerify2FA}
+              disabled={loading || otp.length !== 6}
+            >
+              {loading ? 'Verifying...' : 'Verify & Enable'}
+            </button>
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => {
+                setShow2FASetup(false);
+                setQrCode('');
+                setOtp('');
+              }}
+              disabled={loading}
+              style={{ marginLeft: '10px' }}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Login Alerts */}
@@ -166,10 +418,8 @@ const Security = () => {
             <input 
               type="checkbox"
               checked={securitySettings.loginAlerts}
-              onChange={() => setSecuritySettings(prev => ({
-                ...prev,
-                loginAlerts: !prev.loginAlerts
-              }))}
+              onChange={handleToggleLoginAlerts}
+              disabled={loading}
             />
             <span className="slider"></span>
           </label>
@@ -185,21 +435,35 @@ const Security = () => {
       <div className="security-section">
         <h3>Trusted Devices</h3>
         <div className="trusted-devices">
-          {securitySettings.trustedDevices.map(device => (
-            <div key={device.id} className="device-card">
-              <div className="device-info">
-                <h4>{device.device}</h4>
-                <p className="device-location">📍 {device.location}</p>
-                <p className="device-lastlogin">Last login: {device.lastLogin}</p>
+          {securitySettings.trustedDevices.length === 0 ? (
+            <p className="no-devices">No trusted devices found. Login from a device to see it here.</p>
+          ) : (
+            securitySettings.trustedDevices.map(device => (
+              <div key={device._id} className="device-card">
+                <div className="device-info">
+                  <h4>{device.deviceName}</h4>
+                  <p className="device-location">
+                    📍 {device.location?.city ? 
+                      `${device.location.city}, ${device.location.country}` : 
+                      device.location?.country || 'Unknown Location'}
+                  </p>
+                  <p className="device-lastlogin">
+                    Last login: {formatDate(device.lastLogin)}
+                  </p>
+                  <p className="device-ip" style={{ fontSize: '12px', color: '#666' }}>
+                    IP: {device.ip}
+                  </p>
+                </div>
+                <button 
+                  className="btn-delete"
+                  onClick={() => handleRemoveDevice(device._id)}
+                  disabled={loading}
+                >
+                  Remove
+                </button>
               </div>
-              <button 
-                className="btn-delete"
-                onClick={() => handleRemoveDevice(device.id)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         <p className="section-desc">
           These are devices where you've recently logged in. Remove any devices you don't recognize.

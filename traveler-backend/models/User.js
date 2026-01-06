@@ -25,6 +25,34 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  phone: {
+    type: String,
+    default: ''
+  },
+  dateOfBirth: {
+    type: Date
+  },
+  stripeCustomerId: {
+    type: String,
+    default: ''
+  },
+  // Security fields
+  tokenVersion: {
+    type: Number,
+    default: 0 // Increment to invalidate all existing tokens
+  },
+  twoFASecret: {
+    type: String,
+    default: ''
+  },
+  twoFAEnabled: {
+    type: Boolean,
+    default: false
+  },
+  loginAlerts: {
+    type: Boolean,
+    default: true
+  },
   preferences: {
     language: {
       type: String,

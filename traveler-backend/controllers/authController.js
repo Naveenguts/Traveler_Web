@@ -1,6 +1,11 @@
 const User = require('../models/User');
+const TrustedDevice = require('../models/TrustedDevice');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const speakeasy = require('speakeasy');
+const useragent = require('useragent');
+const geoip = require('geoip-lite');
+const { sendLoginAlert } = require('../services/emailService');
 
 // JWT Secret Key (should be in .env file in production)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
@@ -8,7 +13,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-pro
 // Register new user
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, dateOfBirth } = req.body;
 
     // Validate input
     if (!name || !email || !password) {
@@ -35,15 +40,18 @@ exports.register = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      phone: phone || '',
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined
     });
 
-    // Generate JWT token
+    // Generate JWT token with tokenVersion
     const token = jwt.sign(
       { 
         id: user._id, 
         email: user.email,
-        name: user.name
+        name: user.name,
+        tokenVersion: user.tokenVersion || 0
       },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -58,6 +66,8 @@ exports.register = async (req, res) => {
         name: user.name,
         email: user.email,
         preferences: user.preferences,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
         createdAt: user.createdAt
       }
     });
@@ -74,7 +84,7 @@ exports.register = async (req, res) => {
 // Login user
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, otp } = req.body;
 
     // Validate input
     if (!email || !password) {
@@ -102,12 +112,102 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
+    // If 2FA is enabled, verify OTP
+    if (user.twoFAEnabled) {
+      if (!otp) {
+        return res.status(200).json({
+          success: false,
+          requires2FA: true,
+          message: 'Please provide OTP from your authenticator app'
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        encoding: 'base32',
+        token: otp,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid OTP code'
+        });
+      }
+    }
+
+    // Extract device information
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    const ip = req.ip || req.connection.remoteAddress || 'Unknown';
+    const agent = useragent.parse(userAgent);
+    const geo = geoip.lookup(ip) || {};
+    
+    const deviceInfo = {
+      browser: `${agent.family} ${agent.major || ''}`.trim(),
+      os: `${agent.os.family} ${agent.os.major || ''}`.trim(),
+      ip: ip,
+      location: geo.city || geo.country || 'Unknown',
+      userAgent: userAgent
+    };
+
+    const deviceFingerprint = `${userAgent}-${ip}`;
+
+    // Check if this is a new device
+    const existingDevice = await TrustedDevice.findOne({
+      userId: user._id,
+      deviceFingerprint: deviceFingerprint
+    });
+
+    if (!existingDevice) {
+      // New device - send alert if enabled
+      if (user.loginAlerts) {
+        const timestamp = new Date().toLocaleString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short'
+        });
+
+        await sendLoginAlert(user.email, user.name, {
+          ...deviceInfo,
+          timestamp
+        });
+      }
+
+      // Save new trusted device
+      await TrustedDevice.create({
+        userId: user._id,
+        deviceName: `${deviceInfo.browser} on ${deviceInfo.os}`,
+        browser: deviceInfo.browser,
+        os: deviceInfo.os,
+        ip: deviceInfo.ip,
+        location: {
+          city: geo.city || '',
+          region: geo.region || '',
+          country: geo.country || '',
+          timezone: geo.timezone || ''
+        },
+        userAgent: userAgent,
+        lastLogin: new Date(),
+        deviceFingerprint: deviceFingerprint
+      });
+    } else {
+      // Update last login time
+      existingDevice.lastLogin = new Date();
+      await existingDevice.save();
+    }
+
+    // Generate JWT token with tokenVersion
     const token = jwt.sign(
       { 
         id: user._id, 
         email: user.email,
-        name: user.name
+        name: user.name,
+        tokenVersion: user.tokenVersion
       },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -122,6 +222,9 @@ exports.login = async (req, res) => {
         name: user.name,
         email: user.email,
         preferences: user.preferences,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
+        twoFAEnabled: user.twoFAEnabled,
         createdAt: user.createdAt
       }
     });
@@ -154,6 +257,8 @@ exports.getProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         preferences: user.preferences,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
         createdAt: user.createdAt
       }
     });
@@ -170,11 +275,13 @@ exports.getProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, preferences } = req.body;
+    const { name, preferences, phone, dateOfBirth } = req.body;
     const updates = {};
 
     if (name) updates.name = name;
     if (preferences) updates.preferences = preferences;
+    if (typeof phone !== 'undefined') updates.phone = phone;
+    if (typeof dateOfBirth !== 'undefined') updates.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -197,6 +304,8 @@ exports.updateProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         preferences: user.preferences,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
         createdAt: user.createdAt
       }
     });

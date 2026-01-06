@@ -28,10 +28,14 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const destinationRoutes = require('./routes/destinations');
 const tripRoutes = require('./routes/trips');
+const paymentRoutes = require('./routes/payments');
+const securityRoutes = require('./routes/security');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/security', securityRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

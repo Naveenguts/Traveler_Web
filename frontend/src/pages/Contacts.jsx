@@ -63,7 +63,7 @@ const Contacts = () => {
                 <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" className="contact-card-image" />
                 <h3>Email Support</h3>
                 <p className="contact-desc">For detailed inquiries & bookings</p>
-                <a href="mailto:127003027@sastra.ac.in" className="contact-link">username@gmail.com</a>
+                <a href="mailto:127003169@sastra.ac.in" className="contact-link">username@gmail.com</a>
               </div>
 
               <div className="contact-card primary-card">

@@ -16,9 +16,15 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "geoip-lite": "^1.4.10",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0",
-    "mongoose": "^8.20.4"
+    "mongoose": "^8.20.4",
+    "nodemailer": "^7.0.12",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
+    "stripe": "^17.5.0",
+    "useragent": "^2.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

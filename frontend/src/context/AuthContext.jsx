@@ -170,7 +170,7 @@ export const AuthProvider = ({ children }) => {
   const [trips, setTrips] = useState([]);
   const [tripsLoading, setTripsLoading] = useState(false);
 
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = import.meta?.env?.VITE_API_URL || 'http://localhost:5000/api';
 
   // Fetch trips from backend when user logs in
   const fetchTrips = async () => {
@@ -390,7 +390,9 @@ export const AuthProvider = ({ children }) => {
         updateTrip,
         cancelTrip,
         deleteTrip,
-        getTrip
+        getTrip,
+        token,
+        apiUrl: API_URL
       }}
     >
       {children}
