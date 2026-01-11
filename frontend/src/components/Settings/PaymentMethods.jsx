@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import TwoFAVerificationModal from './TwoFAVerificationModal';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -27,6 +28,10 @@ const PaymentMethods = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [cardName, setCardName] = useState('');
   const [message, setMessage] = useState('');
+  const [show2FAVerification, setShow2FAVerification] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [pendingActionData, setPendingActionData] = useState(null);
+  const [userSettings, setUserSettings] = useState({ twoFAEnabled: false });
 
   const authHeaders = useMemo(() => (
     token ? { Authorization: `Bearer ${token}` } : {}
@@ -45,12 +50,31 @@ const PaymentMethods = () => {
     }
   };
 
+  const fetchSecuritySettings = async () => {
+    if (!token) return;
+    try {
+      const { data } = await axios.get(`${API_BASE}/security/settings`, { headers: authHeaders });
+      setUserSettings({ twoFAEnabled: data.twoFAEnabled });
+    } catch (err) {
+      console.error('Could not load security settings');
+    }
+  };
+
   useEffect(() => {
     fetchMethods();
+    fetchSecuritySettings();
   }, [token]);
 
-  const handleAddPayment = async () => {
+  const handleAddPayment = async (otp = null) => {
     if (!stripe || !elements) return;
+
+    // If 2FA is enabled and OTP is not provided, show verification modal
+    if (userSettings.twoFAEnabled && !otp) {
+      setPendingAction('addPayment');
+      setShow2FAVerification(true);
+      return;
+    }
+
     setSaving(true);
     setMessage('');
     try {
@@ -75,43 +99,110 @@ const PaymentMethods = () => {
 
       const methodId = result.setupIntent.payment_method;
 
+      const addPaymentData = {
+        paymentMethodId: methodId,
+        makeDefault: paymentMethods.length === 0
+      };
+
+      if (otp) {
+        addPaymentData.otp = otp;
+      }
+
       await axios.post(
         `${API_BASE}/payments/add`,
-        { paymentMethodId: methodId, makeDefault: paymentMethods.length === 0 },
+        addPaymentData,
         { headers: authHeaders }
       );
 
       setShowAddForm(false);
       setCardName('');
       elements.getElement(CardElement)?.clear();
+      setShow2FAVerification(false);
+      setPendingAction(null);
       await fetchMethods();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Unable to add payment method';
-      setMessage(msg);
+      if (err.response?.data?.requires2FA) {
+        setPendingAction('addPayment');
+        setShow2FAVerification(true);
+      } else {
+        const msg = err?.response?.data?.message || 'Unable to add payment method';
+        setMessage(msg);
+      }
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDeletePayment = async (id) => {
+  const handleDeletePayment = async (id, otp = null) => {
     setMessage('');
+
+    // If 2FA is enabled and OTP is not provided, show verification modal
+    if (userSettings.twoFAEnabled && !otp) {
+      setPendingAction('deletePayment');
+      setPendingActionData({ id });
+      setShow2FAVerification(true);
+      return;
+    }
+
     try {
-      await axios.delete(`${API_BASE}/payments/${id}`, { headers: authHeaders });
+      const deleteData = {};
+      if (otp) {
+        deleteData.otp = otp;
+      }
+
+      await axios.delete(`${API_BASE}/payments/${id}`, {
+        headers: authHeaders,
+        data: deleteData
+      });
       setPaymentMethods((prev) => prev.filter((p) => p._id !== id));
+      setShow2FAVerification(false);
+      setPendingAction(null);
     } catch (err) {
-      setMessage('Unable to delete payment method');
+      if (err.response?.data?.requires2FA) {
+        setPendingAction('deletePayment');
+        setPendingActionData({ id });
+        setShow2FAVerification(true);
+      } else {
+        setMessage('Unable to delete payment method');
+      }
     }
   };
 
-  const handleSetDefault = async (id) => {
+  const handleSetDefault = async (id, otp = null) => {
     setMessage('');
+
+    // If 2FA is enabled and OTP is not provided, show verification modal
+    if (userSettings.twoFAEnabled && !otp) {
+      setPendingAction('setDefault');
+      setPendingActionData({ id });
+      setShow2FAVerification(true);
+      return;
+    }
+
     try {
-      const { data } = await axios.put(`${API_BASE}/payments/default/${id}`, {}, { headers: authHeaders });
+      const setDefaultData = {};
+      if (otp) {
+        setDefaultData.otp = otp;
+      }
+
+      const { data } = await axios.put(
+        `${API_BASE}/payments/default/${id}`,
+        setDefaultData,
+        { headers: authHeaders }
+      );
       if (data) {
         setPaymentMethods((prev) => prev.map((p) => p._id === id ? data : { ...p, isDefault: false }));
       }
+      setShow2FAVerification(false);
+      setPendingAction(null);
     } catch (err) {
-      setMessage('Unable to update default');
+      if (err.response?.data?.requires2FA) {
+        setPendingAction('setDefault');
+        setPendingActionData({ id });
+        setShow2FAVerification(true);
+      } else {
+        setMessage('Unable to update default');
+      }
     }
   };
 
@@ -119,8 +210,46 @@ const PaymentMethods = () => {
     return <div className="settings-container">Please log in to manage payment methods.</div>;
   }
 
+  const handleTwoFAVerification = async (otp) => {
+    setSaving(true);
+    try {
+      switch (pendingAction) {
+        case 'addPayment':
+          await handleAddPayment(otp);
+          break;
+        case 'deletePayment':
+          await handleDeletePayment(pendingActionData.id, otp);
+          break;
+        case 'setDefault':
+          await handleSetDefault(pendingActionData.id, otp);
+          break;
+        default:
+          break;
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="settings-container">
+      <TwoFAVerificationModal
+        isOpen={show2FAVerification}
+        onVerify={handleTwoFAVerification}
+        onCancel={() => {
+          setShow2FAVerification(false);
+          setPendingAction(null);
+          setPendingActionData(null);
+        }}
+        loading={saving}
+        actionName={
+          pendingAction === 'addPayment' ? 'adding a payment method' :
+          pendingAction === 'deletePayment' ? 'deleting this payment method' :
+          pendingAction === 'setDefault' ? 'setting default payment method' :
+          'this action'
+        }
+      />
+
       <div className="settings-header">
         <h2>Payment Methods</h2>
         <button

@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+const speakeasy = require('speakeasy');
 const PaymentMethod = require('../models/PaymentMethod');
 const User = require('../models/User');
 
@@ -28,8 +29,34 @@ exports.createSetupIntent = async (req, res, next) => {
 
 exports.addPaymentMethod = async (req, res, next) => {
   try {
-    const { paymentMethodId, makeDefault } = req.body;
+    const { paymentMethodId, makeDefault, otp } = req.body;
     const user = await User.findById(req.user.id);
+    
+    // If 2FA is enabled, verify OTP
+    if (user.twoFAEnabled) {
+      if (!otp) {
+        return res.status(403).json({ 
+          message: '2FA verification required',
+          requires2FA: true,
+          twoFAEnabled: true 
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        encoding: 'base32',
+        token: otp,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(401).json({ 
+          message: 'Invalid 2FA code',
+          requires2FA: true 
+        });
+      }
+    }
+
     const customerId = await ensureCustomer(user);
 
     await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
@@ -70,8 +97,35 @@ exports.listPaymentMethods = async (req, res, next) => {
 
 exports.setDefault = async (req, res, next) => {
   try {
+    const { otp } = req.body;
+    const user = await User.findById(req.user.id);
     const doc = await PaymentMethod.findOne({ _id: req.params.id, userId: req.user.id });
     if (!doc) return res.status(404).json({ message: 'Not found' });
+
+    // If 2FA is enabled, verify OTP
+    if (user.twoFAEnabled) {
+      if (!otp) {
+        return res.status(403).json({ 
+          message: '2FA verification required',
+          requires2FA: true,
+          twoFAEnabled: true 
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        encoding: 'base32',
+        token: otp,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(401).json({ 
+          message: 'Invalid 2FA code',
+          requires2FA: true 
+        });
+      }
+    }
 
     await stripe.customers.update(doc.stripeCustomerId, {
       invoice_settings: { default_payment_method: doc.paymentMethodId }
@@ -87,8 +141,35 @@ exports.setDefault = async (req, res, next) => {
 
 exports.deleteMethod = async (req, res, next) => {
   try {
+    const { otp } = req.body;
+    const user = await User.findById(req.user.id);
     const doc = await PaymentMethod.findOne({ _id: req.params.id, userId: req.user.id });
     if (!doc) return res.status(404).json({ message: 'Not found' });
+
+    // If 2FA is enabled, verify OTP
+    if (user.twoFAEnabled) {
+      if (!otp) {
+        return res.status(403).json({ 
+          message: '2FA verification required',
+          requires2FA: true,
+          twoFAEnabled: true 
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        encoding: 'base32',
+        token: otp,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(401).json({ 
+          message: 'Invalid 2FA code',
+          requires2FA: true 
+        });
+      }
+    }
 
     await stripe.paymentMethods.detach(doc.paymentMethodId);
     await doc.deleteOne();

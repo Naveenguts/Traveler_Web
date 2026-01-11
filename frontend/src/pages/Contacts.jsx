@@ -56,7 +56,7 @@ const Contacts = () => {
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" className="contact-card-image" />
                 <h3>WhatsApp Business</h3>
                 <p className="contact-desc">Quick messaging & support</p>
-                <a href="https://wa.me/919025148850" target="_blank" rel="noopener noreferrer" className="contact-link">+91 9025148850</a>
+                <a href="https://wa.me/9360527991" target="_blank" rel="noopener noreferrer" className="contact-link">+91 9360527991</a>
               </div>
 
               <div className="contact-card primary-card">
@@ -70,7 +70,7 @@ const Contacts = () => {
                 <img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Phone" className="contact-card-image" />
                 <h3>Phone Support</h3>
                 <p className="contact-desc">Mon-Sat, 9:00 AM - 6:00 PM</p>
-                <a href="tel:+919025148850" className="contact-link">+91 9025148850</a>
+                <a href="tel:+919360527991" className="contact-link">+91 9360527991</a>
               </div>
             </div>
 

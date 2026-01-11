@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
+import TwoFAVerificationModal from './TwoFAVerificationModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Security = () => {
+  const { token: authToken } = useAuth();
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [qrCode, setQrCode] = useState('');
@@ -21,13 +24,16 @@ const Security = () => {
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState('');
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [show2FAVerification, setShow2FAVerification] = useState(false);
+  const [pendingSensitiveAction, setPendingSensitiveAction] = useState(null);
+  const [pendingActionData, setPendingActionData] = useState(null);
 
   useEffect(() => {
     fetchSecuritySettings();
     fetchTrustedDevices();
   }, []);
 
-  const getAuthToken = () => localStorage.getItem('token');
+  const getAuthToken = () => authToken || localStorage.getItem('traveler_token') || localStorage.getItem('token');
 
   const showMessage = (text, type = 'success') => {
     setMessage({ text, type });
@@ -86,7 +92,7 @@ const Security = () => {
     }
   };
 
-  const handleChangePassword = async () => {
+  const handleChangePassword = async (otp = null) => {
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
       showMessage('Please fill in all password fields', 'error');
       return;
@@ -102,15 +108,30 @@ const Security = () => {
       return;
     }
 
+    // If 2FA is enabled and OTP is not provided, show verification modal
+    if (securitySettings.twoFAEnabled && !otp) {
+      setPendingSensitiveAction('changePassword');
+      setPendingActionData(passwordData);
+      setShow2FAVerification(true);
+      return;
+    }
+
     setLoading(true);
     try {
       const token = getAuthToken();
+      const requestData = {
+        oldPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      };
+
+      // Include OTP if 2FA is enabled
+      if (otp) {
+        requestData.otp = otp;
+      }
+
       const response = await axios.post(
         `${API_URL}/security/change-password`,
-        {
-          oldPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        },
+        requestData,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -119,6 +140,8 @@ const Security = () => {
       showMessage(response.data.message, 'success');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setShowPasswordForm(false);
+      setShow2FAVerification(false);
+      setPendingSensitiveAction(null);
 
       // If requires relogin, logout user
       if (response.data.requiresRelogin) {
@@ -128,16 +151,34 @@ const Security = () => {
         }, 2000);
       }
     } catch (error) {
-      showMessage(error.response?.data?.message || 'Failed to change password', 'error');
+      if (error.response?.data?.requires2FA) {
+        setPendingSensitiveAction('changePassword');
+        setPendingActionData(passwordData);
+        setShow2FAVerification(true);
+      } else {
+        showMessage(error.response?.data?.message || 'Failed to change password', 'error');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleSetup2FA = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      showMessage('Please login again to setup 2FA', 'error');
+      return;
+    }
+
+    // If 2FA is already enabled, require verification first
+    if (securitySettings.twoFAEnabled) {
+      setPendingSensitiveAction('setup2FA');
+      setShow2FAVerification(true);
+      return;
+    }
+
     setLoading(true);
     try {
-      const token = getAuthToken();
       const response = await axios.post(
         `${API_URL}/security/2fa/setup`,
         {},
@@ -156,7 +197,7 @@ const Security = () => {
     }
   };
 
-  const handleVerify2FA = async () => {
+  const handleVerify2FA = async (otp = null) => {
     if (!otp || otp.length !== 6) {
       showMessage('Please enter a valid 6-digit OTP', 'error');
       return;
@@ -185,16 +226,30 @@ const Security = () => {
     }
   };
 
-  const handleDisable2FA = async () => {
+  const handleDisable2FA = async (otp = null) => {
+    // If 2FA is enabled, require verification first
+    if (securitySettings.twoFAEnabled && !otp) {
+      setPendingSensitiveAction('disable2FA');
+      setShow2FAVerification(true);
+      return;
+    }
+
     const password = prompt('Enter your password to disable 2FA:');
     if (!password) return;
 
     setLoading(true);
     try {
       const token = getAuthToken();
+      const requestData = { password };
+
+      // Include OTP if provided (from 2FA verification)
+      if (otp) {
+        requestData.otp = otp;
+      }
+
       const response = await axios.post(
         `${API_URL}/security/2fa/disable`,
-        { password },
+        requestData,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -202,8 +257,15 @@ const Security = () => {
 
       showMessage(response.data.message, 'success');
       setSecuritySettings(prev => ({ ...prev, twoFAEnabled: false }));
+      setShow2FAVerification(false);
+      setPendingSensitiveAction(null);
     } catch (error) {
-      showMessage(error.response?.data?.message || 'Failed to disable 2FA', 'error');
+      if (error.response?.data?.requires2FA) {
+        setPendingSensitiveAction('disable2FA');
+        setShow2FAVerification(true);
+      } else {
+        showMessage(error.response?.data?.message || 'Failed to disable 2FA', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -267,8 +329,48 @@ const Security = () => {
     });
   };
 
+  const handleTwoFAVerification = async (otp) => {
+    setLoading(true);
+    try {
+      switch (pendingSensitiveAction) {
+        case 'changePassword':
+          await handleChangePassword(otp);
+          break;
+        case 'disable2FA':
+          await handleDisable2FA(otp);
+          break;
+        case 'setup2FA':
+          // For setup 2FA when already enabled, just proceed with OTP verification
+          setShow2FAVerification(false);
+          setPendingSensitiveAction(null);
+          break;
+        default:
+          break;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="settings-container">
+      <TwoFAVerificationModal
+        isOpen={show2FAVerification}
+        onVerify={handleTwoFAVerification}
+        onCancel={() => {
+          setShow2FAVerification(false);
+          setPendingSensitiveAction(null);
+          setPendingActionData(null);
+        }}
+        loading={loading}
+        actionName={
+          pendingSensitiveAction === 'changePassword' ? 'changing your password' :
+          pendingSensitiveAction === 'disable2FA' ? 'disabling 2FA' :
+          pendingSensitiveAction === 'setup2FA' ? 'setting up 2FA' :
+          'this action'
+        }
+      />
+
       <div className="settings-header">
         <h2>Security & Password</h2>
       </div>

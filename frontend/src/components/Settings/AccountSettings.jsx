@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 const AccountSettings = () => {
   const { user, token, apiUrl, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const DRAFT_KEY = 'traveler_profile_draft';
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -14,12 +15,25 @@ const AccountSettings = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setFormData({
+    // Initialize from user (server/localStorage persisted)
+    const base = {
       name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
       dateOfBirth: user?.dateOfBirth ? user.dateOfBirth.substring(0, 10) : ''
-    });
+    };
+
+    // If a local draft exists, prefer it for in-progress edits
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        setFormData({ ...base, ...draft });
+        return;
+      }
+    } catch (e) {}
+
+    setFormData(base);
   }, [user?.name, user?.email, user?.phone, user?.dateOfBirth]);
 
   const handleChange = (e) => {
@@ -28,6 +42,12 @@ const AccountSettings = () => {
       ...prev,
       [name]: value
     }));
+
+    // Persist draft locally so edits survive refresh/restarts
+    try {
+      const nextDraft = { ...JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}'), [name]: value };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(nextDraft));
+    } catch (e) {}
   };
 
   const handleSave = async () => {
@@ -62,6 +82,8 @@ const AccountSettings = () => {
         phone: data.user.phone,
         dateOfBirth: data.user.dateOfBirth
       });
+      // Clear local draft after successful save
+      try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
       setIsEditing(false);
       setStatus('Profile updated and saved.');
     } catch (err) {
@@ -103,8 +125,9 @@ const AccountSettings = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            disabled={!isEditing}
-            className={!isEditing ? 'disabled' : ''}
+            disabled
+            readOnly
+            className={'disabled'}
           />
         </div>
 

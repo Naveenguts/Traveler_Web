@@ -117,14 +117,6 @@ const ProfileDropdown = () => {
             <p className="user-email">{user?.email || 'user@example.com'}</p>
           </div>
 
-          <div className="rating-section">
-            <span className="rating-star">⭐</span>
-            <span className="rating-value">4</span>
-            <button className="know-more-btn" onClick={() => handleMenuClick('/profile')}>
-              Know More →
-            </button>
-          </div>
-
           <div className="dropdown-items">
             <button onClick={() => handleMenuClick('/')}>Home</button>
             <button onClick={() => handleMenuClick('/my-trips')}>My Trips</button>

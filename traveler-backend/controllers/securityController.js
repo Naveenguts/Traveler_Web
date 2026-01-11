@@ -8,7 +8,7 @@ const { sendPasswordChangeEmail, send2FAEnabledEmail } = require('../services/em
 // Change Password
 const changePassword = async (req, res) => {
   try {
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword, otp } = req.body;
     
     // Validate input
     if (!oldPassword || !newPassword) {
@@ -23,6 +23,31 @@ const changePassword = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // If 2FA is enabled, verify OTP
+    if (user.twoFAEnabled) {
+      if (!otp) {
+        return res.status(403).json({ 
+          message: '2FA verification required',
+          requires2FA: true,
+          twoFAEnabled: true 
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        encoding: 'base32',
+        token: otp,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(401).json({ 
+          message: 'Invalid 2FA code',
+          requires2FA: true 
+        });
+      }
     }
 
     // Verify old password
@@ -132,7 +157,7 @@ const verify2FA = async (req, res) => {
 // Disable 2FA
 const disable2FA = async (req, res) => {
   try {
-    const { password } = req.body;
+    const { password, otp } = req.body;
 
     if (!password) {
       return res.status(400).json({ message: 'Password is required to disable 2FA' });
@@ -147,6 +172,31 @@ const disable2FA = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Incorrect password' });
+    }
+
+    // If 2FA is enabled, verify OTP
+    if (user.twoFAEnabled) {
+      if (!otp) {
+        return res.status(403).json({ 
+          message: '2FA verification required',
+          requires2FA: true,
+          twoFAEnabled: true 
+        });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        encoding: 'base32',
+        token: otp,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(401).json({ 
+          message: 'Invalid 2FA code',
+          requires2FA: true 
+        });
+      }
     }
 
     // Disable 2FA
