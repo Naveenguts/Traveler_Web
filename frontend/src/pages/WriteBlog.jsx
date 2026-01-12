@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/WriteBlog.css';
 
 const WriteBlog = () => {
   const navigate = useNavigate();
-  const { user, pushAlert } = useAuth();
+  const { user, pushAlert, token, apiUrl, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -17,6 +18,42 @@ const WriteBlog = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Check token validity on component mount
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (!token) {
+        setStatus('Please log in to write blogs.');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiUrl}/auth/verify-token`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.status === 401) {
+          const data = await res.json();
+          setStatus(data?.message || 'Session expired. Please log in again.');
+          setTimeout(() => {
+            logout();
+            navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Token verification error:', error);
+        // Don't logout on network errors, only on auth failures
+      }
+    };
+
+    verifyToken();
+  }, [token, apiUrl, logout, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,30 +121,66 @@ const WriteBlog = () => {
       return;
     }
 
+    if (!user?.id) {
+      pushAlert('Please log in to publish blogs');
+      navigate('/login');
+      return;
+    }
+
     setIsLoading(true);
+    setStatus(''); // Clear previous status
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const apiUrl = import.meta?.env?.VITE_API_URL || 'http://localhost:5000/api';
+      const token = localStorage.getItem('traveler_token');
 
-      // Create blog object
-      const newBlog = {
-        id: Date.now(),
-        title: formData.title,
-        description: formData.description,
-        content: formData.content,
-        image: formData.image,
-        category: formData.category,
-        author: user?.name || 'Anonymous',
-        date: new Date().toISOString(),
-        views: 0,
-        likes: 0
-      };
+      if (!token) {
+        setStatus('Session expired. Please log in again.');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
+        return;
+      }
 
-      // Here you would typically send the blog data to your backend
-      console.log('New blog created:', newBlog);
+      const response = await fetch(`${apiUrl}/blogs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          content: formData.content,
+          image: formData.image,
+          category: formData.category,
+          tags: [] // You can add tags functionality later
+        })
+      });
+
+      const data = await response.json();
+
+      // Handle token expiration
+      if (response.status === 401) {
+        const errorMsg = data?.message || 'Session expired. Please log in again.';
+        setStatus(errorMsg);
+        setTimeout(() => {
+          logout();
+          navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
+        }, 1500);
+        return;
+      }
+
+      if (!response.ok) {
+        // Provide more specific error messages
+        if (response.status === 413) {
+          throw new Error('Image is too large. Please use a smaller image (under 5MB)');
+        }
+        throw new Error(data.message || 'Failed to publish blog');
+      }
 
       pushAlert('Blog published successfully! 🎉');
+      setStatus('success: Blog published successfully!');
       
       // Reset form
       setFormData({
@@ -123,8 +196,14 @@ const WriteBlog = () => {
         navigate('/blogs');
       }, 2000);
     } catch (error) {
-      pushAlert('Error publishing blog. Please try again.');
-      console.error('Error:', error);
+      console.error('Error publishing blog:', error);
+      const errorMessage = error.message || 'Error publishing blog. Please try again.';
+      pushAlert(errorMessage);
+      setStatus(errorMessage); // Also show in status message
+      if (errorMessage.toLowerCase().includes('session expired')) {
+        logout();
+        navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -230,23 +309,8 @@ const WriteBlog = () => {
           <div className="form-group">
             <label htmlFor="content">Blog Content *</label>
             <div className="content-editor">
-              <div className="editor-toolbar">
-                <button type="button" title="Bold" className="format-btn">
-                  <strong>B</strong>
-                </button>
-                <button type="button" title="Italic" className="format-btn">
-                  <em>I</em>
-                </button>
-                <button type="button" title="Underline" className="format-btn">
-                  <u>U</u>
-                </button>
-                <div className="toolbar-divider"></div>
-                <button type="button" title="Bullet List" className="format-btn">
-                  •••
-                </button>
-                <button type="button" title="Numbered List" className="format-btn">
-                  123
-                </button>
+              <div className="editor-help-text">
+                <small>💡 Tip: Press Enter twice to create a new paragraph. Use - at the start of a line for bullet points.</small>
               </div>
               <textarea
                 id="content"
@@ -280,6 +344,13 @@ const WriteBlog = () => {
               {isLoading ? 'Publishing...' : 'Publish Blog'}
             </button>
           </div>
+
+          {/* Status Message */}
+          {status && (
+            <div className={`status-message ${status.includes('success') ? 'success' : 'error'}`}>
+              {status}
+            </div>
+          )}
         </form>
 
         {/* Tips Section */}

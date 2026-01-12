@@ -17,10 +17,12 @@ const BlogCard = ({ id, title, description, date, image, author }) => {
         <h3 className="blog-card-title">{title}</h3>
         <p className="blog-card-description">{description}</p>
         <div className="blog-card-meta">
-          <span className="blog-date">
-            <i className="icon-calendar"></i>
-            {formatDate(date)}
-          </span>
+          {date && (
+            <span className="blog-date">
+              <i className="icon-calendar"></i>
+              {formatDate(date)}
+            </span>
+          )}
           {author && <span className="blog-author">By {author}</span>}
         </div>
         <Link to={`/blogs/${id}`} className="blog-read-more">

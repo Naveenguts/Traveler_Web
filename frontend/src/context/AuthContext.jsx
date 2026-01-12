@@ -172,6 +172,31 @@ export const AuthProvider = ({ children }) => {
 
   const API_URL = import.meta?.env?.VITE_API_URL || 'http://localhost:5000/api';
 
+  // Check if token is still valid
+  const checkTokenValidity = async () => {
+    if (!token || !user) return false;
+    
+    try {
+      const response = await fetch(`${API_URL}/auth/verify-token`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.status === 401) {
+        // Token is invalid or expired
+        logout();
+        return false;
+      }
+      
+      return response.ok;
+    } catch (error) {
+      console.error('Error checking token validity:', error);
+      return true; // Don't logout on network errors
+    }
+  };
+
   // Fetch trips from backend when user logs in
   const fetchTrips = async () => {
     if (!user?.id) return;
@@ -392,7 +417,8 @@ export const AuthProvider = ({ children }) => {
         deleteTrip,
         getTrip,
         token,
-        apiUrl: API_URL
+        apiUrl: API_URL,
+        checkTokenValidity
       }}
     >
       {children}

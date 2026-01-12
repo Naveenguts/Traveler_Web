@@ -11,7 +11,8 @@ connectDB();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increased limit for image uploads
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Disable caching for all responses
 app.use((req, res, next) => {
@@ -30,12 +31,14 @@ const destinationRoutes = require('./routes/destinations');
 const tripRoutes = require('./routes/trips');
 const paymentRoutes = require('./routes/payments');
 const securityRoutes = require('./routes/security');
+const blogRoutes = require('./routes/blogs');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/security', securityRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -55,6 +58,7 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       destinations: '/api/destinations',
       trips: '/api/trips',
+      blogs: '/api/blogs',
       health: '/api/health'
     }
   });

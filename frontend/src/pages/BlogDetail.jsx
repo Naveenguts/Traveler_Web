@@ -1,102 +1,101 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import RelatedBlogs from '../components/RelatedBlogs';
 import '../styles/BlogDetail.css';
 
 const BlogDetail = () => {
-  // Mock blog data - replace with API call later
-  const [allBlogs] = useState([
-    {
-      id: 1,
-      title: '10 Best Hidden Gems in Southeast Asia',
-      description: 'Discover the most breathtaking and lesser-known destinations across Southeast Asia that will blow your mind.',
-      date: '2024-12-10',
-      author: 'Sarah Johnson',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop',
-      content: `Southeast Asia is a treasure trove of amazing destinations, and while places like Thailand, Vietnam, and Cambodia are well-known, there are many hidden gems waiting to be discovered.
-
-## 1. Luang Prabang, Laos
-Nestled along the Mekong River, Luang Prabang is a charming town filled with stunning temples and colonial architecture. The best time to visit is during the cool season from October to March.
-
-## 2. Palawan, Philippines
-Known as the "Last Frontier" of the Philippines, Palawan offers pristine beaches, crystal-clear waters, and exceptional diving opportunities. The island is home to the famous Underground River and the stunning Coron Island.
-
-## 3. Hoi An, Vietnam
-This ancient town features well-preserved architecture dating back centuries. The lantern-lit streets come alive at night, and the food scene is absolutely incredible.
-
-## 4. Koh Rong, Cambodia
-If you want pristine beaches without the crowds, Koh Rong is the place. This island offers beautiful coastlines, jungle trails, and marine wildlife encounters.
-
-## Tips for Exploring:
-- Rent scooters for getting around
-- Stay in local guesthouses for authentic experiences
-- Try local street food
-- Visit during shoulder seasons to avoid crowds
-- Respect local customs and traditions
-
-These hidden gems offer authentic experiences that you won't find in the typical tourist guides. Pack your bags and explore Southeast Asia beyond the beaten path!`
-    },
-    {
-      id: 2,
-      title: 'Budget Travel Tips: Save Money While Exploring the World',
-      description: 'Learn practical tips and tricks to travel on a budget without compromising on the quality of your experience.',
-      date: '2024-12-08',
-      author: 'Mike Chen',
-      image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&h=600&fit=crop',
-      content: 'Budget travel content here...'
-    },
-    {
-      id: 3,
-      title: 'Adventure Awaits: Rock Climbing Destinations Around the Globe',
-      description: 'From Patagonia to the Alps, explore the world\'s most thrilling rock climbing destinations for adventurers of all levels.',
-      date: '2024-12-05',
-      author: 'Alex Rivera',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop',
-      content: 'Rock climbing content here...'
-    },
-    {
-      id: 4,
-      title: 'Cultural Experiences: Learning From Local Communities',
-      description: 'Travel beyond tourism and connect with local cultures, traditions, and communities in meaningful ways.',
-      date: '2024-12-01',
-      author: 'Emma Wilson',
-      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=600&fit=crop',
-      content: 'Cultural content here...'
-    },
-    {
-      id: 5,
-      title: 'Beach Paradise: Top Tropical Destinations for 2025',
-      description: 'Looking for the perfect beach getaway? Check out our curated list of tropical paradises you must visit.',
-      date: '2024-11-28',
-      author: 'James Smith',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=600&fit=crop',
-      content: 'Beach content here...'
-    },
-    {
-      id: 6,
-      title: 'Winter Wonderland: Best Snow Destinations This Season',
-      description: 'Experience magical snow-covered landscapes and winter activities in these stunning snow destinations.',
-      date: '2024-11-25',
-      author: 'Lisa Anderson',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop',
-      content: 'Winter content here...'
-    }
-  ]);
-
   const { id } = useParams();
-  const blog = allBlogs.find(b => b.id === parseInt(id));
+  const navigate = useNavigate();
+  const apiUrl = import.meta?.env?.VITE_API_URL || 'http://localhost:5000/api';
+
+  const [blog, setBlog] = useState(null);
+  const [allBlogs, setAllBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareText = blog?.title || 'Check out this blog';
+
+  const formatInline = (text) => {
+    // Escape HTML first
+    let safe = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Basic formatting: bold, italic, underline (from toolbar), line breaks
+    safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    safe = safe.replace(/&lt;u&gt;(.+?)&lt;\/u&gt;/g, '<u>$1</u>');
+    safe = safe.replace(/\n/g, '<br />');
+
+    return safe;
+  };
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  if (!blog) {
+  useEffect(() => {
+    const fetchBlog = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch(`${apiUrl}/blogs/${id}`);
+        if (res.status === 404) {
+          setError('Blog not found');
+          setBlog(null);
+        } else {
+          const data = await res.json();
+          if (!data.success) {
+            throw new Error(data.message || 'Failed to load blog');
+          }
+          setBlog(data.blog);
+        }
+      } catch (err) {
+        setError(err.message || 'Unable to load blog');
+        setBlog(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchRelated = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/blogs?limit=6`);
+        const data = await res.json();
+        if (data.success) {
+          setAllBlogs(data.blogs);
+        }
+      } catch (err) {
+        // Related blogs are optional; ignore errors silently
+      }
+    };
+
+    fetchBlog();
+    fetchRelated();
+  }, [apiUrl, id]);
+
+  const relatedBlogs = useMemo(() => {
+    return allBlogs.filter((b) => b._id !== blog?._id);
+  }, [allBlogs, blog?._id]);
+
+  if (loading) {
+    return (
+      <div className="blog-detail-page">
+        <div className="blog-loading">Loading blog...</div>
+      </div>
+    );
+  }
+
+  if (error || !blog) {
     return (
       <div className="blog-detail-page">
         <div className="blog-not-found">
           <h2>Blog not found</h2>
-          <p>The blog you're looking for doesn't exist.</p>
+          <p>{error || "The blog you're looking for doesn't exist."}</p>
+          <button className="btn" onClick={() => navigate('/blogs')}>Back to Blogs</button>
         </div>
       </div>
     );
@@ -117,11 +116,11 @@ These hidden gems offer authentic experiences that you won't find in the typical
             <div className="blog-detail-meta">
               <div className="author-info">
                 <div className="author-avatar">
-                  {blog.author.charAt(0)}
+                  {(blog.author?.name || 'A').charAt(0)}
                 </div>
                 <div>
-                  <p className="author-name">{blog.author}</p>
-                  <p className="publish-date">{formatDate(blog.date)}</p>
+                  <p className="author-name">{blog.author?.name || 'Anonymous'}</p>
+                  <p className="publish-date">{formatDate(blog.createdAt || blog.date)}</p>
                 </div>
               </div>
             </div>
@@ -129,7 +128,7 @@ These hidden gems offer authentic experiences that you won't find in the typical
 
           {/* Blog Content */}
           <div className="blog-detail-content">
-            {blog.content.split('\n\n').map((paragraph, index) => {
+            {(blog.content || '').split('\n\n').map((paragraph, index) => {
               if (paragraph.startsWith('##')) {
                 return (
                   <h2 key={index} className="blog-section-title">
@@ -141,15 +140,17 @@ These hidden gems offer authentic experiences that you won't find in the typical
                 return (
                   <ul key={index} className="blog-list">
                     {paragraph.split('\n').map((item, i) => (
-                      <li key={i}>{item.replace('- ', '')}</li>
+                      <li key={i} dangerouslySetInnerHTML={{ __html: formatInline(item.replace('- ', '')) }} />
                     ))}
                   </ul>
                 );
               }
               return (
-                <p key={index} className="blog-paragraph">
-                  {paragraph}
-                </p>
+                <p
+                  key={index}
+                  className="blog-paragraph"
+                  dangerouslySetInnerHTML={{ __html: formatInline(paragraph) }}
+                />
               );
             })}
           </div>
@@ -158,16 +159,48 @@ These hidden gems offer authentic experiences that you won't find in the typical
           <div className="blog-share">
             <span className="share-label">Share this article:</span>
             <div className="share-buttons">
-              <a href="#" className="share-btn facebook" title="Share on Facebook">f</a>
-              <a href="#" className="share-btn twitter" title="Share on Twitter">𝕏</a>
-              <a href="#" className="share-btn linkedin" title="Share on LinkedIn">in</a>
-              <a href="#" className="share-btn email" title="Share via Email">✉</a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                className="share-btn facebook"
+                title="Share on Facebook"
+                target="_blank"
+                rel="noreferrer"
+              >
+                f
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`}
+                className="share-btn twitter"
+                title="Share on X"
+                target="_blank"
+                rel="noreferrer"
+              >
+                𝕏
+              </a>
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+                className="share-btn linkedin"
+                title="Share on LinkedIn"
+                target="_blank"
+                rel="noreferrer"
+              >
+                in
+              </a>
+              <a
+                href={`mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(shareUrl)}`}
+                className="share-btn email"
+                title="Share via Email"
+                target="_blank"
+                rel="noreferrer"
+              >
+                ✉
+              </a>
             </div>
           </div>
         </article>
 
         {/* Related Blogs */}
-        <RelatedBlogs currentBlogId={blog.id} allBlogs={allBlogs} />
+        <RelatedBlogs currentBlogId={blog._id} allBlogs={relatedBlogs} />
       </div>
     </div>
   );

@@ -3,9 +3,8 @@ import BlogCard from './BlogCard';
 import '../styles/RelatedBlogs.css';
 
 const RelatedBlogs = ({ currentBlogId, allBlogs }) => {
-  // Get 3 related blogs (excluding current blog)
-  const relatedBlogs = allBlogs
-    .filter(blog => blog.id !== currentBlogId)
+  const relatedBlogs = (allBlogs || [])
+    .filter((blog) => blog._id !== currentBlogId)
     .slice(0, 3);
 
   if (relatedBlogs.length === 0) return null;
@@ -17,14 +16,14 @@ const RelatedBlogs = ({ currentBlogId, allBlogs }) => {
         <div className="header-underline"></div>
       </div>
       <div className="related-blogs-grid">
-        {relatedBlogs.map(blog => (
+        {relatedBlogs.map((blog) => (
           <BlogCard
-            key={blog.id}
-            id={blog.id}
+            key={blog._id}
+            id={blog._id}
             title={blog.title}
             description={blog.description}
-            date={blog.date}
-            author={blog.author}
+            date={blog.createdAt || blog.date}
+            author={blog.author?.name || 'Anonymous'}
             image={blog.image}
           />
         ))}

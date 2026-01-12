@@ -17,4 +17,10 @@ router.get('/profile', auth, authController.getProfile);
 // PUT /api/auth/profile
 router.put('/profile', auth, authController.updateProfile);
 
+// GET /api/auth/verify-token - Verify if token is still valid
+router.get('/verify-token', auth, (req, res) => {
+  // If middleware passes, token is valid
+  res.json({ success: true, valid: true, user: req.user });
+});
+
 module.exports = router;

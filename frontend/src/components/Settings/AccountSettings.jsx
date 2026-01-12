@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AccountSettings = () => {
-  const { user, token, apiUrl, updateUser } = useAuth();
+  const { user, token, apiUrl, updateUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const DRAFT_KEY = 'traveler_profile_draft';
   const [formData, setFormData] = useState({
@@ -13,6 +15,42 @@ const AccountSettings = () => {
   });
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Check token validity on component mount
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (!token) {
+        setStatus('Please log in to access account settings.');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiUrl}/auth/verify-token`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.status === 401) {
+          const data = await res.json();
+          setStatus(data?.message || 'Session expired. Please log in again.');
+          setTimeout(() => {
+            logout();
+            navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Token verification error:', error);
+        // Don't logout on network errors, only on auth failures
+      }
+    };
+
+    verifyToken();
+  }, [token, apiUrl, logout, navigate]);
 
   useEffect(() => {
     // Initialize from user (server/localStorage persisted)
@@ -72,6 +110,17 @@ const AccountSettings = () => {
         })
       });
       const data = await res.json();
+      
+      // Handle token expiration
+      if (res.status === 401 && data?.message?.toLowerCase().includes('token expired')) {
+        setStatus('Your session has expired. Redirecting to login...');
+        setTimeout(() => {
+          logout();
+          navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
+        }, 1500);
+        return;
+      }
+      
       if (!res.ok || !data?.success) {
         throw new Error(data?.message || 'Unable to update profile');
       }

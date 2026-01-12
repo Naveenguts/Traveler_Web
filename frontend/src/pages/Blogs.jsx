@@ -1,62 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BlogCard from '../components/BlogCard';
 import '../styles/Blogs.css';
 
 const Blogs = () => {
-  // Mock blog data - replace with API call later
-  const [blogs] = useState([
-    {
-      id: 1,
-      title: '10 Best Hidden Gems in Southeast Asia',
-      description: 'Discover the most breathtaking and lesser-known destinations across Southeast Asia that will blow your mind.',
-      date: '2024-12-10',
-      author: 'Sarah Johnson',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop'
-    },
-    {
-      id: 2,
-      title: 'Budget Travel Tips: Save Money While Exploring the World',
-      description: 'Learn practical tips and tricks to travel on a budget without compromising on the quality of your experience.',
-      date: '2024-12-08',
-      author: 'Mike Chen',
-      image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&h=400&fit=crop'
-    },
-    {
-      id: 3,
-      title: 'Adventure Awaits: Rock Climbing Destinations Around the Globe',
-      description: 'From Patagonia to the Alps, explore the world\'s most thrilling rock climbing destinations for adventurers of all levels.',
-      date: '2024-12-05',
-      author: 'Alex Rivera',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop'
-    },
-    {
-      id: 4,
-      title: 'Cultural Experiences: Learning From Local Communities',
-      description: 'Travel beyond tourism and connect with local cultures, traditions, and communities in meaningful ways.',
-      date: '2024-12-01',
-      author: 'Emma Wilson',
-      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=400&fit=crop'
-    },
-    {
-      id: 5,
-      title: 'Beach Paradise: Top Tropical Destinations for 2025',
-      description: 'Looking for the perfect beach getaway? Check out our curated list of tropical paradises you must visit.',
-      date: '2024-11-28',
-      author: 'James Smith',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=400&fit=crop'
-    },
-    {
-      id: 6,
-      title: 'Winter Wonderland: Best Snow Destinations This Season',
-      description: 'Experience magical snow-covered landscapes and winter activities in these stunning snow destinations.',
-      date: '2024-11-25',
-      author: 'Lisa Anderson',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop'
-    }
-  ]);
-
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredBlogs, setFilteredBlogs] = useState(blogs);
+  const [filteredBlogs, setFilteredBlogs] = useState([]);
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const fetchBlogs = async () => {
+    try {
+      const apiUrl = import.meta?.env?.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${apiUrl}/blogs?limit=50`);
+      const data = await response.json();
+
+      if (data.success) {
+        setBlogs(data.blogs);
+        setFilteredBlogs(data.blogs);
+      } else {
+        setError('Failed to load blogs');
+      }
+    } catch (err) {
+      console.error('Error fetching blogs:', err);
+      setError('Error loading blogs. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (e) => {
     const term = e.target.value;
@@ -65,10 +40,32 @@ const Blogs = () => {
     const filtered = blogs.filter(blog =>
       blog.title.toLowerCase().includes(term.toLowerCase()) ||
       blog.description.toLowerCase().includes(term.toLowerCase()) ||
-      blog.author.toLowerCase().includes(term.toLowerCase())
+      blog.author.name.toLowerCase().includes(term.toLowerCase()) ||
+      blog.category.toLowerCase().includes(term.toLowerCase())
     );
     setFilteredBlogs(filtered);
   };
+
+  if (loading) {
+    return (
+      <div className="blogs-page">
+        <div className="loading-container">
+          <p>Loading blogs...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="blogs-page">
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchBlogs} className="btn btn-primary">Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="blogs-page">
@@ -92,13 +89,16 @@ const Blogs = () => {
           <div className="blogs-grid">
             {filteredBlogs.map(blog => (
               <BlogCard
-                key={blog.id}
-                id={blog.id}
+                key={blog._id}
+                id={blog._id}
                 title={blog.title}
                 description={blog.description}
-                date={blog.date}
-                author={blog.author}
+                date={new Date(blog.createdAt).toLocaleDateString()}
+                author={blog.author.name}
                 image={blog.image}
+                category={blog.category}
+                views={blog.views}
+                likes={blog.likes}
               />
             ))}
           </div>
