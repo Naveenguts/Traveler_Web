@@ -147,8 +147,8 @@ const Header = () => {
         <nav className="main-nav">
           <Link to="/">Home</Link>
           <Link to="/destinations">Destinations</Link>
-          <Link to="/about">About</Link>
-          <Link to="/contacts">Contact</Link>
+          <Link to="/map">Map</Link>
+          <Link to="/explore">Explore</Link>
         </nav>
       </div>
       <div className="header-right">

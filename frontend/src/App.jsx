@@ -18,10 +18,15 @@ import EditProfile from './pages/EditProfile';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import AboutUs from './pages/AboutUs';
-import Contacts from './pages/Contacts';
 import ErrorMessage from './pages/ErrorMessage';
 import Settings from './pages/Settings';
 import SupportInfo from './pages/SupportInfo';
+import Help from './pages/Help';
+import FAQs from './pages/FAQs';
+import ContactUs from './pages/ContactUs';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import MapExperience from './pages/MapExperience';
+import Explore from './pages/Explore';
 
 const App = () => {
   return (
@@ -39,7 +44,14 @@ const App = () => {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/map" element={<MapExperience />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/faqs" element={<FAQs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/contacts" element={<ContactUs />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
