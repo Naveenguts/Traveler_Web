@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { reviewAPI, destinationAPI } from '../services/reviewService';
+import { externalAPI } from '../services/externalApiService';
 
 const destinationsData = [
   { 
@@ -11,7 +13,28 @@ const destinationsData = [
     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=500&fit=crop',
     longDescription: 'Paris, the capital of France, is one of the most iconic cities in the world. Known for its art, fashion, gastronomy, and culture, Paris offers unforgettable experiences from the Eiffel Tower to the Louvre Museum.',
     price: 2500,
-    duration: 7
+    duration: 7,
+    famousPlaces: [
+      { name: 'Eiffel Tower', description: 'Iconic iron tower and symbol of Paris', image: 'https://images.unsplash.com/photo-1511739001486-6bfe966ce51b?w=300&h=200&fit=crop' },
+      { name: 'Louvre Museum', description: 'World\'s largest art museum', image: 'https://images.unsplash.com/photo-1499480098471-c6ff26a84fb4?w=300&h=200&fit=crop' },
+      { name: 'Notre-Dame Cathedral', description: 'Historic Gothic cathedral with stunning architecture', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=200&fit=crop' },
+      { name: 'Champs-Élysées', description: 'Elegant avenue lined with shops and cafés', image: 'https://images.unsplash.com/photo-1520956305896-3a55c8340e74?w=300&h=200&fit=crop' },
+      { name: 'Montmartre', description: 'Historic hilltop neighborhood with artistic charm', image: 'https://images.unsplash.com/photo-1493514789921-586cb221acd7?w=300&h=200&fit=crop' }
+    ],
+    hotels: [
+      { name: 'Hotel Lutetia', stars: 5, price: 18000, description: 'Luxury hotel in central Paris with world-class amenities' },
+      { name: 'Le Meurice', stars: 5, price: 20000, description: 'Ultra-luxurious palace hotel with Michelin-starred dining' },
+      { name: 'Hotel de Crillon', stars: 5, price: 17000, description: 'Historic luxury hotel on the Champs-Élysées' },
+      { name: 'Ibis Paris', stars: 3, price: 6000, description: 'Affordable & comfortable stay near metro stations' },
+      { name: 'Generator Paris', stars: 2, price: 3000, description: 'Budget-friendly hostel with vibrant community atmosphere' }
+    ],
+    flights: {
+      nearestAirport: 'Charles de Gaulle (CDG)',
+      fromIndia: 'Delhi (DEL) → Paris (CDG)',
+      duration: '9-10 hours (with 1 stop)',
+      airlines: ['Air France', 'Emirates', 'Lufthansa', 'Turkish Airlines'],
+      averagePrice: '₹45,000 - ₹70,000'
+    }
   },
   { 
     id: 2, 
@@ -21,7 +44,28 @@ const destinationsData = [
     image: 'https://images.unsplash.com/photo-1540959375944-7049f642e9a4?w=800&h=500&fit=crop',
     longDescription: 'Tokyo is a bustling metropolis that seamlessly blends ancient traditions with modern technology. Experience incredible food, vibrant neighborhoods, and rich cultural heritage.',
     price: 3200,
-    duration: 10
+    duration: 10,
+    famousPlaces: [
+      { name: 'Senso-ji Temple', description: 'Tokyo\'s oldest temple with historic charm', image: 'https://images.unsplash.com/photo-1540959375944-7049f642e9a4?w=300&h=200&fit=crop' },
+      { name: 'Tokyo Skytree', description: 'Tallest structure in Japan with observation decks', image: 'https://images.unsplash.com/photo-1563629049957-78b5a4e4e5c7?w=300&h=200&fit=crop' },
+      { name: 'Shibuya Crossing', description: 'World\'s busiest pedestrian crossing', image: 'https://images.unsplash.com/photo-1511739001486-6bfe966ce51b?w=300&h=200&fit=crop' },
+      { name: 'Mount Fuji', description: 'Japan\'s iconic snow-capped mountain', image: 'https://images.unsplash.com/photo-1522383546121-2c5a00621cff?w=300&h=200&fit=crop' },
+      { name: 'Meiji Shrine', description: 'Peaceful Shinto shrine in a forested area', image: 'https://images.unsplash.com/photo-1493514789921-586cb221acd7?w=300&h=200&fit=crop' }
+    ],
+    hotels: [
+      { name: 'Park Hyatt Tokyo', stars: 5, price: 22000, description: 'Luxury hotel with panoramic city views' },
+      { name: 'The Peninsula Tokyo', stars: 5, price: 19000, description: 'Elegant hotel near Imperial Palace' },
+      { name: 'Shinjuku Prince Hotel', stars: 4, price: 12000, description: 'Business hotel in vibrant Shinjuku area' },
+      { name: 'Hotel Gracery Shinjuku', stars: 3, price: 8000, description: 'Modern affordable hotel near Shinjuku Station' },
+      { name: 'Khaosan Tokyo Kabuki', stars: 2, price: 2500, description: 'Cozy budget hostel in Asakusa' }
+    ],
+    flights: {
+      nearestAirport: 'Narita (NRT) / Haneda (HND)',
+      fromIndia: 'Delhi (DEL) → Tokyo (HND)',
+      duration: '7-8 hours (with 1 stop)',
+      airlines: ['ANA', 'JAL', 'United Airlines', 'Emirates'],
+      averagePrice: '₹40,000 - ₹65,000'
+    }
   },
   { 
     id: 3, 
@@ -31,7 +75,28 @@ const destinationsData = [
     image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&h=500&fit=crop',
     longDescription: 'New York City is the city that never sleeps. From Times Square to Central Park, Broadway shows to world-class museums, NYC offers endless excitement and cultural diversity.',
     price: 2800,
-    duration: 5
+    duration: 5,
+    famousPlaces: [
+      { name: 'Statue of Liberty', description: 'Iconic symbol of freedom and democracy', image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=300&h=200&fit=crop' },
+      { name: 'Central Park', description: 'Large urban park with scenic walks and activities', image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=200&fit=crop' },
+      { name: 'Times Square', description: 'Bustling commercial and entertainment hub', image: 'https://images.unsplash.com/photo-1515288840272-e4ebe2b1b50e?w=300&h=200&fit=crop' },
+      { name: 'Empire State Building', description: 'Art Deco skyscraper with observation deck', image: 'https://images.unsplash.com/photo-1520556881214-36ccdd98e2fb?w=300&h=200&fit=crop' },
+      { name: 'Brooklyn Bridge', description: 'Historic bridge with stunning Manhattan views', image: 'https://images.unsplash.com/photo-1503235930437-8c6293ba41f3?w=300&h=200&fit=crop' }
+    ],
+    hotels: [
+      { name: 'The Plaza Hotel', stars: 5, price: 25000, description: 'Iconic luxury hotel on Fifth Avenue' },
+      { name: 'Waldorf Astoria', stars: 5, price: 23000, description: 'Historic luxury hotel with elegant suites' },
+      { name: 'Marriott Marquis', stars: 4, price: 14000, description: 'Large hotel in Times Square with great views' },
+      { name: 'Holiday Inn Express', stars: 3, price: 9000, description: 'Mid-range comfortable hotel' },
+      { name: 'HI New York Hostel', stars: 2, price: 3500, description: 'Budget-friendly hostel on Upper West Side' }
+    ],
+    flights: {
+      nearestAirport: 'JFK / LaGuardia (LGA)',
+      fromIndia: 'Delhi (DEL) → New York (JFK)',
+      duration: '15-16 hours (non-stop)',
+      airlines: ['Air India', 'United Airlines', 'American Airlines', 'Emirates'],
+      averagePrice: '₹50,000 - ₹80,000'
+    }
   },
   { 
     id: 4, 
@@ -41,7 +106,28 @@ const destinationsData = [
     image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&h=500&fit=crop',
     longDescription: 'London combines centuries of history with cutting-edge innovation. Visit Buckingham Palace, explore world-renowned museums, and enjoy the vibrant theater scene.',
     price: 2200,
-    duration: 6
+    duration: 6,
+    famousPlaces: [
+      { name: 'Big Ben & Parliament', description: 'Gothic Revival architecture and iconic clock tower', image: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=300&h=200&fit=crop' },
+      { name: 'Buckingham Palace', description: 'Official residence of the British Monarch', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=300&h=200&fit=crop' },
+      { name: 'Tower of London', description: 'Historic castle with Crown Jewels exhibition', image: 'https://images.unsplash.com/photo-1532619927891-a4d71312aabf?w=300&h=200&fit=crop' },
+      { name: 'British Museum', description: 'World-renowned museum with ancient artifacts', image: 'https://images.unsplash.com/photo-1498199810021-b21ba212f0b0?w=300&h=200&fit=crop' },
+      { name: 'Tower Bridge', description: 'Iconic bascule bridge with stunning views', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=300&h=200&fit=crop' }
+    ],
+    hotels: [
+      { name: 'Claridge\'s', stars: 5, price: 20000, description: 'Iconic luxury hotel in Mayfair' },
+      { name: 'Savoy', stars: 5, price: 19000, description: 'Riverside luxury hotel with river views' },
+      { name: 'Marriott Grosvenor Square', stars: 4, price: 13000, description: 'Upper-class hotel in central London' },
+      { name: 'Premier Inn', stars: 3, price: 7000, description: 'Budget-friendly hotel chain' },
+      { name: 'YHA London Central', stars: 2, price: 3000, description: 'Affordable hostel near British Museum' }
+    ],
+    flights: {
+      nearestAirport: 'Heathrow (LHR) / Gatwick (LGW)',
+      fromIndia: 'Delhi (DEL) → London (LHR)',
+      duration: '8-9 hours (non-stop)',
+      airlines: ['Air India', 'British Airways', 'Virgin Atlantic', 'Emirates'],
+      averagePrice: '₹35,000 - ₹60,000'
+    }
   },
   { 
     id: 5, 
@@ -51,7 +137,28 @@ const destinationsData = [
     image: 'https://images.unsplash.com/photo-1512453693020-ce7e46f9e4c9?w=800&h=500&fit=crop',
     longDescription: 'Dubai is a futuristic city in the desert, known for luxury shopping, ultramodern architecture, and a lively nightlife scene. Experience the Burj Khalifa and traditional souks.',
     price: 3500,
-    duration: 8
+    duration: 8,
+    famousPlaces: [
+      { name: 'Burj Khalifa', description: 'World\'s tallest building with observation decks', image: 'https://images.unsplash.com/photo-1512453693020-ce7e46f9e4c9?w=300&h=200&fit=crop' },
+      { name: 'Dubai Mall', description: 'One of the world\'s largest shopping malls', image: 'https://images.unsplash.com/photo-1520444196009-9efc8c1d50f5?w=300&h=200&fit=crop' },
+      { name: 'Palm Jumeirah', description: 'Artificial palm-shaped island with luxury resorts', image: 'https://images.unsplash.com/photo-1512453693020-ce7e46f9e4c9?w=300&h=200&fit=crop' },
+      { name: 'Gold Souk', description: 'Traditional market selling gold and jewelry', image: 'https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=300&h=200&fit=crop' },
+      { name: 'Dubai Marina', description: 'Modern waterfront with luxury yachts and dining', image: 'https://images.unsplash.com/photo-1520444196009-9efc8c1d50f5?w=300&h=200&fit=crop' }
+    ],
+    hotels: [
+      { name: 'Burj Al Arab', stars: 5, price: 28000, description: 'Ultra-luxury 7-star hotel shaped like a sail' },
+      { name: 'Atlantis The Palm', stars: 5, price: 22000, description: 'Resort with aquarium and water park' },
+      { name: 'Emirates Palace', stars: 5, price: 20000, description: 'Opulent palace-style luxury hotel' },
+      { name: 'Holiday Inn Dubai Marina', stars: 3, price: 8000, description: 'Modern 3-star hotel with marina views' },
+      { name: 'Gold Coast Hotel', stars: 2, price: 4000, description: 'Budget beach hotel' }
+    ],
+    flights: {
+      nearestAirport: 'Dubai International (DXB)',
+      fromIndia: 'Delhi (DEL) → Dubai (DXB)',
+      duration: '3.5 hours (non-stop)',
+      airlines: ['Emirates', 'FlyDubai', 'Air India', 'Flydubai'],
+      averagePrice: '₹15,000 - ₹35,000'
+    }
   },
   { 
     id: 6, 
@@ -61,23 +168,32 @@ const destinationsData = [
     image: 'https://images.unsplash.com/photo-1562883676-8c6fbdf495c0?w=800&h=500&fit=crop',
     longDescription: 'Barcelona offers stunning architecture by Gaudí, beautiful beaches, delicious cuisine, and a vibrant cultural scene. The perfect blend of urban excitement and Mediterranean relaxation.',
     price: 1800,
-    duration: 5
+    duration: 5,
+    famousPlaces: [
+      { name: 'Sagrada Familia', description: 'Iconic basilica designed by Antoni Gaudí', image: 'https://images.unsplash.com/photo-1562883676-8c6fbdf495c0?w=300&h=200&fit=crop' },
+      { name: 'Park Güell', description: 'Colorful mosaic park with panoramic city views', image: 'https://images.unsplash.com/photo-1469022563149-aa64dbd37dae?w=300&h=200&fit=crop' },
+      { name: 'Las Ramblas', description: 'Tree-lined pedestrian street with street performers', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&h=200&fit=crop' },
+      { name: 'Gothic Quarter', description: 'Medieval neighborhood with narrow winding streets', image: 'https://images.unsplash.com/photo-1562883676-8c6fbdf495c0?w=300&h=200&fit=crop' },
+      { name: 'Barcelona Beach', description: 'Beautiful Mediterranean beach for relaxation', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=200&fit=crop' }
+    ],
+    hotels: [
+      { name: 'Hotel Arts Barcelona', stars: 5, price: 18000, description: 'Modern luxury hotel with beach views' },
+      { name: 'Mandarin Oriental Barcelona', stars: 5, price: 17000, description: 'Elegant luxury hotel with rooftop pool' },
+      { name: 'Paseo de Gracia Hotel', stars: 4, price: 11000, description: 'Boutique hotel on famous avenue' },
+      { name: 'Hotel Continental', stars: 3, price: 5500, description: 'Budget-friendly hotel in Gothic Quarter' },
+      { name: 'Generator Barcelona', stars: 2, price: 2500, description: 'Budget hostel with social atmosphere' }
+    ],
+    flights: {
+      nearestAirport: 'Barcelona-El Prat (BCN)',
+      fromIndia: 'Delhi (DEL) → Barcelona (BCN)',
+      duration: '10-11 hours (1 stop)',
+      airlines: ['Air India', 'Lufthansa', 'Turkish Airlines', 'Ryanair'],
+      averagePrice: '₹38,000 - ₹62,000'
+    }
   },
 ];
 
-// Sample initial reviews
-const initialReviews = {
-  1: [
-    { id: 1, userName: 'Sarah Johnson', rating: 5, comment: 'Absolutely amazing! Paris exceeded all my expectations. The Eiffel Tower at night is breathtaking.', date: '2024-11-20', userAvatar: 'SJ' },
-    { id: 2, userName: 'Michael Chen', rating: 4, comment: 'Great city with so much to see. Food was incredible but quite expensive.', date: '2024-11-15', userAvatar: 'MC' }
-  ],
-  2: [
-    { id: 1, userName: 'Emma Wilson', rating: 5, comment: 'Tokyo is a dream! The culture, food, and people are wonderful. Can\'t wait to go back!', date: '2024-10-28', userAvatar: 'EW' }
-  ],
-  3: [
-    { id: 1, userName: 'David Martinez', rating: 4, comment: 'NYC is incredible but very crowded. Loved the museums and Broadway shows.', date: '2024-11-05', userAvatar: 'DM' }
-  ]
-};
+
 
 const StarRating = ({ rating, onRatingChange, readonly = false }) => {
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -101,12 +217,28 @@ const StarRating = ({ rating, onRatingChange, readonly = false }) => {
 
 const DestinationDetails = () => {
   const { id } = useParams();
-  const { user, addTrip, trips } = useAuth();
+  const { user, addTrip, trips, token } = useAuth();
   const destination = destinationsData.find(dest => dest.id === parseInt(id));
   
-  const [reviews, setReviews] = useState(initialReviews[parseInt(id)] || []);
+  const [apiDestination, setApiDestination] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState(null);
+  const [submittingReview, setSubmittingReview] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
+  // Real API data
+  const [realFlights, setRealFlights] = useState(null);
+  const [realHotels, setRealHotels] = useState(null);
+  const [realWeather, setRealWeather] = useState(null);
+  const [countryInfo, setCountryInfo] = useState(null);
+  const [flightsLoading, setFlightsLoading] = useState(false);
+  const [hotelsLoading, setHotelsLoading] = useState(false);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [flightsError, setFlightsError] = useState(null);
+  const [hotelsError, setHotelsError] = useState(null);
+  const [weatherError, setWeatherError] = useState(null);
+  const [weatherRetryCount, setWeatherRetryCount] = useState(0);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showUpiPinModal, setShowUpiPinModal] = useState(false);
@@ -244,12 +376,231 @@ const DestinationDetails = () => {
     }
   }, [bookingData.startDate, bookingData.endDate, trips, destination.name]);
 
+  // Fetch destination from API and then reviews
+  useEffect(() => {
+    const fetchDestinationAndReviews = async () => {
+      if (!destination) return;
+      
+      try {
+        setReviewsLoading(true);
+        setReviewsError(null);
+        
+        console.log('Fetching destination and reviews for:', destination.name);
+        
+        // First, try to get all destinations from API to find the matching one
+        try {
+          const destData = await destinationAPI.getAllDestinations();
+          console.log('Destinations from API:', destData);
+          
+          const apiDest = destData.destinations?.find(
+            d => d.name.toLowerCase() === destination.name.toLowerCase()
+          );
+          
+          if (apiDest) {
+            console.log('Found matching destination:', apiDest);
+            setApiDestination(apiDest);
+            // Now fetch reviews using the real MongoDB ID
+            const reviewData = await reviewAPI.getDestinationReviews(apiDest._id);
+            console.log('Reviews fetched:', reviewData);
+            setReviews(reviewData.reviews || []);
+          } else {
+            // Destination not found in API, show message
+            console.error('Destination not found in API');
+            setReviewsError('Destination not found in database. Please seed destinations first.');
+            setReviews([]);
+          }
+        } catch (apiError) {
+          // API might not be available or destinations not seeded
+          console.error('API Error:', apiError);
+          setReviewsError('Unable to connect to server. Reviews are unavailable.');
+          setReviews([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+        setReviewsError(error.message);
+        setReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchDestinationAndReviews();
+  }, [destination]);
+
+  // Fetch real-time flights and hotels data
+  useEffect(() => {
+    const fetchExternalData = async () => {
+      if (!destination) return;
+
+      try {
+        // Map destination names to airport codes
+        const airportCodes = {
+          'Paris': { flight: 'CDG', city: 'Paris' },
+          'Tokyo': { flight: 'HND', city: 'Tokyo' },
+          'New York': { flight: 'JFK', city: 'New York' },
+          'Barcelona': { flight: 'BCN', city: 'Barcelona' },
+          'Bangkok': { flight: 'BKK', city: 'Bangkok' }
+        };
+
+        const airports = airportCodes[destination.name] || { flight: 'CDG', city: destination.name };
+
+        // Fetch flights
+        try {
+          setFlightsLoading(true);
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const dateStr = tomorrow.toISOString().split('T')[0];
+
+          const flightData = await externalAPI.searchFlights('DEL', airports.flight, dateStr, 1);
+          setRealFlights(flightData);
+          setFlightsError(null);
+        } catch (err) {
+          console.error('Error fetching flights:', err);
+          setFlightsError('Unable to load real flights. Using static data.');
+          setRealFlights(null);
+        } finally {
+          setFlightsLoading(false);
+        }
+
+        // Fetch hotels
+        try {
+          setHotelsLoading(true);
+          const checkIn = new Date();
+          checkIn.setDate(checkIn.getDate() + 1);
+          const checkOut = new Date(checkIn);
+          checkOut.setDate(checkOut.getDate() + 3);
+
+          console.log('🏨 Fetching hotels for:', airports.city, 'from', checkIn.toISOString().split('T')[0], 'to', checkOut.toISOString().split('T')[0]);
+          
+          const hotelData = await externalAPI.getHotels(
+            airports.city,
+            checkIn.toISOString().split('T')[0],
+            checkOut.toISOString().split('T')[0],
+            1
+          );
+          
+          console.log('🏨 Hotels API Response:', hotelData);
+          console.log('🏨 Hotels count:', hotelData?.hotels?.length || 0);
+          
+          if (hotelData && hotelData.success) {
+            if (hotelData.isEmpty || hotelData.hotels.length === 0) {
+              setHotelsError('Hotels unavailable for selected location');
+              setRealHotels(null);
+            } else {
+              setRealHotels(hotelData);
+              setHotelsError(null);
+            }
+          } else {
+            setHotelsError('Live data unavailable. Showing recommendations.');
+            setRealHotels(null);
+          }
+        } catch (err) {
+          console.error('❌ Error fetching hotels:', err);
+          console.error('❌ Error details:', err.message);
+          setHotelsError('Live data unavailable. Showing recommendations.');
+          setRealHotels(null);
+        } finally {
+          setHotelsLoading(false);
+        }
+
+        // Fetch weather
+        try {
+          setWeatherLoading(true);
+          const weatherData = await externalAPI.getWeather(airports.city);
+          console.log('🌤️ Weather data:', weatherData);
+          
+          // Validate weather response structure
+          if (weatherData && weatherData.success && weatherData.data && weatherData.data.temperature !== undefined) {
+            setRealWeather(weatherData);
+            setWeatherError(null);
+            setWeatherRetryCount(0);
+            console.log('✅ Weather fetched successfully for:', airports.city);
+          } else {
+            console.warn('⚠️ Weather API returned incomplete data for:', airports.city);
+            setWeatherError(`Weather data unavailable for "${airports.city}". This location may not be in the weather database.`);
+            setRealWeather(null);
+          }
+        } catch (err) {
+          console.error('❌ Error fetching weather:', err.message);
+          let errorMessage = 'Unable to fetch weather data';
+          
+          if (err.response?.status === 404) {
+            errorMessage = `Weather not available for "${airports.city}" - location not found in database`;
+          } else if (err.response?.status === 401) {
+            errorMessage = 'Weather API authentication failed - check API key configuration';
+          } else if (err.message.includes('Network')) {
+            errorMessage = 'Network error - unable to reach weather service. Check your connection.';
+          }
+          
+          setWeatherError(errorMessage);
+          setRealWeather(null);
+        } finally {
+          setWeatherLoading(false);
+        }
+
+        // Fetch country info
+        try {
+          const countryData = await externalAPI.getCountryInfo(destination.country);
+          console.log('🌍 Country info:', countryData);
+          setCountryInfo(countryData);
+        } catch (err) {
+          console.error('❌ Error fetching country info:', err);
+          setCountryInfo(null);
+        }
+      } catch (error) {
+        console.error('Error in external API fetch:', error);
+      }
+    };
+
+    fetchExternalData();
+  }, [destination]);
+
+  // Retry weather fetch with alternative city names
+  const retryWeatherFetch = async () => {
+    if (!destination) return;
+    
+    try {
+      setWeatherRetryCount(prev => prev + 1);
+      setWeatherLoading(true);
+      setWeatherError(null);
+      
+      // Try with destination country as fallback
+      const cityToTry = destination.name;
+      console.log('🔄 Retrying weather fetch for:', cityToTry, '(Attempt:', weatherRetryCount + 1, ')');
+      
+      const weatherData = await externalAPI.getWeather(cityToTry);
+      console.log('🌤️ Weather retry data:', weatherData);
+      
+      if (weatherData && weatherData.success && weatherData.data && weatherData.data.temperature !== undefined) {
+        setRealWeather(weatherData);
+        setWeatherError(null);
+        setWeatherRetryCount(0);
+        console.log('✅ Weather fetched successfully on retry');
+      } else {
+        const errorMsg = weatherRetryCount >= 2 
+          ? `Weather not available for "${cityToTry}". Please try another destination.`
+          : `Weather data unavailable for "${cityToTry}". Please try again.`;
+        setWeatherError(errorMsg);
+        setRealWeather(null);
+      }
+    } catch (err) {
+      console.error('❌ Weather retry failed:', err.message);
+      const errorMsg = weatherRetryCount >= 2
+        ? 'Unable to fetch weather after multiple attempts. Please check your connection.'
+        : 'Failed to fetch weather. Please try again.';
+      setWeatherError(errorMsg);
+      setRealWeather(null);
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
+
   // Calculate average rating
   const averageRating = reviews.length > 0 
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
     : 0;
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
     
     if (!user) {
@@ -267,18 +618,43 @@ const DestinationDetails = () => {
       return;
     }
 
-    const review = {
-      id: reviews.length + 1,
-      userName: user.name || 'Anonymous User',
-      rating: newReview.rating,
-      comment: newReview.comment,
-      date: new Date().toISOString().split('T')[0],
-      userAvatar: user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'
-    };
+    if (newReview.comment.trim().length < 10) {
+      alert('Review must be at least 10 characters long');
+      return;
+    }
 
-    setReviews([review, ...reviews]);
-    setNewReview({ rating: 0, comment: '' });
-    setShowReviewForm(false);
+    try {
+      setSubmittingReview(true);
+      
+      if (!apiDestination) {
+        alert('Destination not found in database. Please ensure destinations are seeded.');
+        setSubmittingReview(false);
+        return;
+      }
+      
+      const response = await reviewAPI.createReview(
+        apiDestination._id,
+        destination.name,
+        newReview.rating,
+        newReview.comment.trim(),
+        token
+      );
+
+      // Add new review to the top of the list
+      const reviewWithAvatar = {
+        ...response.review,
+        userAvatar: user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'
+      };
+      setReviews([reviewWithAvatar, ...reviews]);
+      setNewReview({ rating: 0, comment: '' });
+      setShowReviewForm(false);
+      alert('Review submitted successfully!');
+    } catch (error) {
+      console.error('Failed to submit review:', error);
+      alert(error.message || 'Failed to submit review. Please try again.');
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const handleBookTrip = (e) => {
@@ -554,6 +930,259 @@ const DestinationDetails = () => {
             </button>
           </div>
 
+          {/* Weather & Country Info Section */}
+          <div className="weather-country-section">
+            {/* Weather Card */}
+            {weatherLoading ? (
+              <div className="weather-card loading">
+                <h3>🌤️ Weather</h3>
+                <p>Loading weather data...</p>
+              </div>
+            ) : realWeather && realWeather.success && realWeather.data ? (
+              <div className="weather-card">
+                <h3>🌤️ Current Weather in {realWeather.data.city}</h3>
+                <div className="weather-content">
+                  <div className="weather-main">
+                    <div className="weather-temp">{Math.round(realWeather.data.temperature)}°</div>
+                    <div className="weather-desc">{realWeather.data.description}</div>
+                  </div>
+                  <div className="weather-details">
+                    <div className="weather-detail-item">
+                      <span className="detail-label">💧 Humidity:</span>
+                      <span className="detail-value">{realWeather.data.humidity}%</span>
+                    </div>
+                    <div className="weather-detail-item">
+                      <span className="detail-label">💨 Wind:</span>
+                      <span className="detail-value">{realWeather.data.windSpeed.toFixed(1)} m/s</span>
+                    </div>
+                    <div className="weather-detail-item">
+                      <span className="detail-label">🌡️ Feels Like:</span>
+                      <span className="detail-value">{Math.round(realWeather.data.feelsLike)}°C</span>
+                    </div>
+                    <div className="weather-detail-item">
+                      <span className="detail-label">🔽 Pressure:</span>
+                      <span className="detail-value">{realWeather.data.pressure} hPa</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="api-credit">⚡ Real-time data from OpenWeather API</p>
+              </div>
+            ) : (
+              <div className="weather-card error">
+                <h3>🌤️ Weather</h3>
+                <p className="error-title">{weatherError || 'Weather data unavailable for this location'}</p>
+                <p className="error-detail">
+                  {weatherError?.includes('not found') 
+                    ? 'This location may not be available in the weather database. Try another destination.'
+                    : 'Check your internet connection and try again.'}
+                </p>
+                <button 
+                  className="weather-retry-btn"
+                  onClick={retryWeatherFetch}
+                  disabled={weatherLoading}
+                >
+                  🔄 {weatherRetryCount > 0 ? `Retry (Attempt ${weatherRetryCount + 1})` : 'Try Again'}
+                </button>
+              </div>
+            )}
+
+            {/* Country Info Card */}
+            {countryInfo && countryInfo.data ? (
+              <div className="country-info-card">
+                <h3>🌍 Country Information - {countryInfo.data.official}</h3>
+                <div className="country-content">
+                  <div className="country-flag">{countryInfo.data.flag}</div>
+                  <div className="country-details">
+                    <div className="country-detail-item">
+                      <span className="detail-label">🏛️ Capital:</span>
+                      <span className="detail-value">{countryInfo.data.capital}</span>
+                    </div>
+                    <div className="country-detail-item">
+                      <span className="detail-label">💰 Currency:</span>
+                      <span className="detail-value">{countryInfo.data.currencyName} ({countryInfo.data.currency})</span>
+                    </div>
+                    <div className="country-detail-item">
+                      <span className="detail-label">👥 Population:</span>
+                      <span className="detail-value">{(countryInfo.data.population / 1000000).toFixed(1)}M people</span>
+                    </div>
+                    <div className="country-detail-item">
+                      <span className="detail-label">🗺️ Region:</span>
+                      <span className="detail-value">{countryInfo.data.region}</span>
+                    </div>
+                    <div className="country-detail-item">
+                      <span className="detail-label">🕐 Timezone:</span>
+                      <span className="detail-value">{countryInfo.data.timezone}</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="api-credit">⚡ Real-time data from REST Countries API</p>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Famous Places Section */}
+          {destination.famousPlaces && (
+            <section className="places-section">
+              <h2>Famous Places in {destination.name}</h2>
+              <div className="places-grid">
+                {destination.famousPlaces.map((place, index) => (
+                  <div key={index} className="place-card">
+                    <img src={place.image} alt={place.name} />
+                    <div className="place-card-content">
+                      <h4>{place.name}</h4>
+                      <p>{place.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Hotels Section */}
+          {destination.hotels && (
+            <section className="hotels-section">
+              <h2>Recommended Hotels</h2>
+              
+              {hotelsLoading && (
+                <div className="loading-indicator">
+                  <p>✈️ Loading real hotels from Amadeus...</p>
+                </div>
+              )}
+              
+              {realHotels && realHotels.hotels && Array.isArray(realHotels.hotels) && realHotels.hotels.length > 0 ? (
+                <div className="real-hotels-container">
+                  <h3>✨ Real-Time Hotel Options (from Amadeus)</h3>
+                  <div className="hotels-grid">
+                    {realHotels.hotels.slice(0, 6).map((hotel, index) => (
+                      <div key={index} className="hotel-card">
+                        <div className="hotel-card-header">
+                          <h4>{hotel.name || `Hotel ${index + 1}`}</h4>
+                          <div className="hotel-rating">
+                            {'⭐'.repeat(Math.ceil(hotel.rating || 4))}
+                          </div>
+                        </div>
+                        <p className="hotel-description">{hotel.address?.city || 'Premium accommodation'}</p>
+                        <div className="hotel-details">
+                          <p><strong>Location:</strong> {hotel.address?.city || 'City'}, {hotel.address?.country || 'Country'}</p>
+                          <p><strong>Check-in:</strong> {hotel.checkInDate || 'TBD'}</p>
+                          <p><strong>Check-out:</strong> {hotel.checkOutDate || 'TBD'}</p>
+                          <p><strong>Rooms:</strong> {hotel.rooms || 1}</p>
+                        </div>
+                        <div className="hotel-footer">
+                          <span className="hotel-price">{hotel.currency || '€'}{hotel.price || 'Contact'}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{fontSize: '12px', color: '#888', marginTop: '10px', textAlign: 'center'}}>💡 Real-time data from Amadeus API • Prices shown for selected dates</p>
+                </div>
+              ) : (
+                <div className="static-hotels-info">
+                  <div className="hotels-grid">
+                    {destination.hotels.map((hotel, index) => (
+                      <div key={index} className="hotel-card">
+                        <div className="hotel-card-header">
+                          <h4>{hotel.name}</h4>
+                          <div className="hotel-rating">
+                            {'⭐'.repeat(hotel.stars)}
+                          </div>
+                        </div>
+                        <p className="hotel-description">{hotel.description}</p>
+                        <div className="hotel-footer">
+                          <span className="hotel-price">₹{hotel.price.toLocaleString()} / night</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {hotelsError && <p style={{color: '#d32f2f', marginTop: '10px'}}>ℹ️ {hotelsError}</p>}
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* Flights / How to Reach Section */}
+          {destination.flights && (
+            <section className="flights-section">
+              <h2>✈️ How to Reach {destination.name}</h2>
+              
+              {/* Real Flights from API */}
+              {flightsLoading && (
+                <div className="loading-indicator">
+                  <p>✈️ Loading real flights from Amadeus...</p>
+                </div>
+              )}
+              
+              {realFlights && realFlights.flights && Array.isArray(realFlights.flights) && realFlights.flights.length > 0 ? (
+                <div className="real-flights-container">
+                  <h3>✨ Real-Time Flight Options from Delhi</h3>
+                  <div className="flights-grid">
+                    {realFlights.flights.slice(0, 4).map((flight, index) => (
+                      <div key={index} className="flight-card">
+                        <div className="flight-header">
+                          <div className="flight-route">
+                            <span className="from-to">{flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode || 'DEL'}</span>
+                            <span className="arrow">→</span>
+                            <span className="from-to">{flight.itineraries?.[0]?.segments?.[flight.itineraries?.[0]?.segments?.length - 1]?.arrival?.iataCode || 'CDG'}</span>
+                          </div>
+                          <div className="flight-price">
+                            <span className="price-value">€{flight.price?.total || 'N/A'}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flight-details">
+                          <div className="detail-row">
+                            <span className="label">Duration:</span>
+                            <span className="value">{flight.itineraries?.[0]?.duration?.replace('PT', '').replace('H', 'h ').replace('M', 'm') || 'N/A'}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="label">Airline:</span>
+                            <span className="value">{flight.validatingAirlineCodes?.[0] || 'Multiple'}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="label">Stops:</span>
+                            <span className="value">{(flight.itineraries?.[0]?.segments?.length || 1) - 1} stop(s)</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="label">Seats:</span>
+                            <span className="value">{flight.numberOfBookableSeats || 'Available'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{fontSize: '12px', color: '#888', marginTop: '10px', textAlign: 'center'}}>💡 Real-time data from Amadeus API • Prices in EUR</p>
+                </div>
+              ) : (
+                <div className="static-flights-info">
+                  {flightsError && <p style={{color: '#d32f2f', marginBottom: '10px'}}>ℹ️ {flightsError}</p>}
+                  <div className="flights-info">
+                    <div className="flight-info-item">
+                      <span className="info-label">Nearest Airport:</span>
+                      <span className="info-value">{destination.flights.nearestAirport}</span>
+                    </div>
+                    <div className="flight-info-item">
+                      <span className="info-label">Route from India:</span>
+                      <span className="info-value">{destination.flights.fromIndia}</span>
+                    </div>
+                    <div className="flight-info-item">
+                      <span className="info-label">Flight Duration:</span>
+                      <span className="info-value">{destination.flights.duration}</span>
+                    </div>
+                    <div className="flight-info-item">
+                      <span className="info-label">Popular Airlines:</span>
+                      <span className="info-value">{destination.flights.airlines.join(', ')}</span>
+                    </div>
+                    <div className="flight-info-item highlight">
+                      <span className="info-label">Average Price:</span>
+                      <span className="info-value">{destination.flights.averagePrice}</span>
+                    </div>
+                  </div>
+                  {flightsError && <p style={{color: '#d32f2f', marginTop: '10px'}}>ℹ️ {flightsError}</p>}
+                </div>
+              )}
+            </section>
+          )}
+
           {/* Reviews Section */}
           <div className="reviews-section">
             <div className="reviews-header">
@@ -599,30 +1228,65 @@ const DestinationDetails = () => {
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-primary">Submit Review</button>
+                <button type="submit" className="btn btn-primary" disabled={submittingReview}>
+                  {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
               </form>
             )}
 
             {/* Reviews List */}
             <div className="reviews-list">
-              {reviews.length === 0 ? (
+              {reviewsLoading ? (
+                <div className="reviews-loading">
+                  <p>Loading reviews...</p>
+                </div>
+              ) : reviewsError ? (
+                <div className="reviews-error">
+                  <p>{reviewsError}</p>
+                  {reviewsError.includes('seed') && (
+                    <div style={{ marginTop: '16px' }}>
+                      <p style={{ fontSize: '14px', color: '#666' }}>
+                        To fix this, run the following command in your backend terminal:
+                      </p>
+                      <code style={{ display: 'block', padding: '12px', background: '#f5f5f5', borderRadius: '4px', marginTop: '8px' }}>
+                        POST http://localhost:5000/api/destinations/seed
+                      </code>
+                      <p style={{ fontSize: '14px', color: '#666', marginTop: '8px' }}>
+                        Or use this curl command:
+                      </p>
+                      <code style={{ display: 'block', padding: '12px', background: '#f5f5f5', borderRadius: '4px', marginTop: '8px' }}>
+                        curl -X POST http://localhost:5000/api/destinations/seed
+                      </code>
+                    </div>
+                  )}
+                </div>
+              ) : reviews.length === 0 ? (
                 <p className="no-reviews">No reviews yet. Be the first to review this destination!</p>
               ) : (
-                reviews.map((review) => (
-                  <div key={review.id} className="review-card">
-                    <div className="review-header">
-                      <div className="reviewer-info">
-                        <div className="reviewer-avatar">{review.userAvatar}</div>
-                        <div>
-                          <h4 className="reviewer-name">{review.userName}</h4>
-                          <p className="review-date">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                reviews.map((review) => {
+                  const reviewDate = review.createdAt || review.date;
+                  const userAvatar = review.userAvatar || (review.userName ? review.userName.split(' ').map(n => n[0]).join('').toUpperCase() : 'U');
+                  return (
+                    <div key={review._id || review.id} className="review-card">
+                      <div className="review-header">
+                        <div className="reviewer-info">
+                          <div className="reviewer-avatar">{userAvatar}</div>
+                          <div>
+                            <h4 className="reviewer-name">{review.userName}</h4>
+                            <p className="review-date">{new Date(reviewDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          </div>
                         </div>
+                        <StarRating rating={review.rating} readonly={true} />
                       </div>
-                      <StarRating rating={review.rating} readonly={true} />
+                      <p className="review-comment">{review.comment}</p>
+                      {review.helpful > 0 && (
+                        <div className="review-helpful">
+                          <span>👍 {review.helpful} {review.helpful === 1 ? 'person' : 'people'} found this helpful</span>
+                        </div>
+                      )}
                     </div>
-                    <p className="review-comment">{review.comment}</p>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

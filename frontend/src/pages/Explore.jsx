@@ -70,11 +70,27 @@ const Explore = () => {
     overlays.current = [];
   };
 
-  const exploreCategory = (amenityType) => {
+  const exploreCategory = (category) => {
     if (!mapInstance.current) return;
-    
+
+    const categoryLabel = ExploreCategories.find((c) => c.value === category)?.label || category;
+    const categoryConfig = {
+      restaurant: { key: 'amenity', tag: 'restaurant' },
+      hotel: { key: 'tourism', tag: 'hotel' },
+      tourism: { key: 'tourism', tag: 'attraction' },
+      shop: { key: 'shop', tag: 'mall' },
+      hospital: { key: 'amenity', tag: 'hospital' },
+      museum: { key: 'tourism', tag: 'museum' },
+      cafe: { key: 'amenity', tag: 'cafe' },
+      park: { key: 'leisure', tag: 'park' },
+    }[category];
+
+    if (!categoryConfig) {
+      setStatus('Unsupported category');
+      return;
+    }
+
     setLoading(true);
-    const categoryLabel = ExploreCategories.find(c => c.value === amenityType)?.label || amenityType;
     setStatus(`Searching for ${categoryLabel.toLowerCase()}...`);
     clearOverlays();
 
@@ -95,20 +111,9 @@ const Explore = () => {
 
     mapInstance.current.setView([lat, lng], 14);
 
-    const amenityMap = {
-      restaurant: 'restaurant',
-      hotel: 'hotel',
-      tourism: 'tourism',
-      shop: 'shop',
-      hospital: 'hospital',
-      museum: 'museum',
-      cafe: 'cafe',
-      park: 'park'
-    };
-
     const query = `
       [out:json];
-      node["amenity"="${amenityMap[amenityType]}"](around:3000, ${lat}, ${lng});
+      node["${categoryConfig.key}"="${categoryConfig.tag}"](around:3000, ${lat}, ${lng});
       out 100;
     `;
 
@@ -164,6 +169,9 @@ const Explore = () => {
     <div className="map-experience-container">
       <div className="map-experience-header">
         <h2>🌍 Explore</h2>
+        <div className="map-nav-tabs" style={{ marginTop: '16px' }}>
+          <button className="active">Nearby</button>
+        </div>
       </div>
 
       <div className="map-content">

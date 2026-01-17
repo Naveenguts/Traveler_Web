@@ -32,13 +32,17 @@ const tripRoutes = require('./routes/trips');
 const paymentRoutes = require('./routes/payments');
 const securityRoutes = require('./routes/security');
 const blogRoutes = require('./routes/blogs');
+const reviewRoutes = require('./routes/reviews');
+const externalApiRoutes = require('./routes/external-apis');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/external', externalApiRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -1385,6 +1385,616 @@ footer.footer {
   background: linear-gradient(135deg, #0096c7 0%, #005f88 100%);
 }
 
+/* Famous Places Section */
+.places-section {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin: 2rem 0;
+}
+
+.places-section h2 {
+  font-size: 2rem;
+  color: #023047;
+  margin-bottom: 1.5rem;
+}
+
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.place-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.place-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.place-card-content {
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+.place-card-content h4 {
+  font-size: 1.2rem;
+  color: #023047;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+
+.place-card-content p {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Weather & Country Info Section */
+.weather-country-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin: 2.5rem 0;
+}
+
+.weather-card,
+.country-info-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+  border: none;
+  overflow: hidden;
+}
+
+.weather-card:hover,
+.country-info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.16);
+}
+
+/* Weather Card */
+.weather-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  position: relative;
+}
+
+.weather-card.loading {
+  background: linear-gradient(135deg, #e0e7ff 0%, #f3e7e9 100%);
+  color: #023047;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.weather-card.error {
+  background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+  color: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.weather-card h3,
+.country-info-card h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.weather-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.weather-main {
+  text-align: center;
+  min-width: 120px;
+}
+
+.weather-temp {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.weather-desc {
+  font-size: 1.1rem;
+  text-transform: capitalize;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+.weather-details {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+.weather-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.weather-detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.detail-value {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.error-detail {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.weather-retry-btn {
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.25);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.weather-retry-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.weather-retry-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.weather-retry-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Country Info Card */
+.country-info-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 2rem;
+  position: relative;
+}
+
+.country-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.country-flag {
+  font-size: 5rem;
+  line-height: 1;
+  min-width: 80px;
+  text-align: center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.country-details {
+  flex: 1;
+}
+
+.country-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.country-detail-item:last-child {
+  border-bottom: none;
+}
+
+.country-detail-item .detail-label {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.country-detail-item .detail-value {
+  font-weight: 700;
+  text-align: right;
+  max-width: 150px;
+}
+
+.api-credit {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .weather-country-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .weather-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .weather-temp {
+    font-size: 3rem;
+  }
+
+  .country-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .country-detail-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .country-detail-item .detail-value {
+    text-align: center;
+    max-width: 100%;
+  }
+}
+
+/* Hotels Section */
+.hotels-section {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin: 2rem 0;
+}
+
+.hotels-section h2 {
+  font-size: 2rem;
+  color: #023047;
+  margin-bottom: 1.5rem;
+}
+
+.hotels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.hotel-card {
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.hotel-card:hover {
+  border-color: #00b4d8;
+  box-shadow: 0 8px 20px rgba(0, 180, 216, 0.2);
+}
+
+.hotel-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.hotel-card-header h4 {
+  font-size: 1.2rem;
+  color: #023047;
+  margin: 0;
+  font-weight: 700;
+  flex: 1;
+}
+
+.hotel-rating {
+  font-size: 1rem;
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.hotel-description {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+
+.hotel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d1d5db;
+}
+
+.hotel-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #00b4d8;
+}
+
+/* Real Hotels Container */
+.real-hotels-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.real-hotels-container h3 {
+  font-size: 1.3rem;
+  color: #023047;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.hotel-details {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+
+.hotel-details p {
+  margin: 0.5rem 0;
+}
+
+.hotel-details strong {
+  color: #023047;
+  font-weight: 600;
+}
+
+.static-hotels-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+/* Flights Section */
+.flights-section {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+  border: 2px solid #7dd3fc;
+}
+
+.flights-section h2 {
+  font-size: 2rem;
+  color: #023047;
+  margin-bottom: 1.5rem;
+}
+
+.flights-section h3 {
+  font-size: 1.3rem;
+  color: #023047;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+/* Real Flights Container */
+.real-flights-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.flights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.flight-card {
+  background: white;
+  border: 2px solid #e0e7ff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.flight-card:hover {
+  border-color: #7dd3fc;
+  box-shadow: 0 8px 16px rgba(125,211,252,0.2);
+  transform: translateY(-4px);
+}
+
+.flight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.flight-route {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #023047;
+}
+
+.flight-route .from-to {
+  background: #e0f2fe;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.flight-route .arrow {
+  color: #7dd3fc;
+  font-size: 1.3rem;
+}
+
+.flight-price {
+  text-align: right;
+}
+
+.price-value {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.flight-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #023047;
+}
+
+.detail-row .value {
+  color: #666;
+}
+
+.static-flights-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.flights-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.flight-info-item {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 4px solid #00b4d8;
+  transition: all 0.3s ease;
+}
+
+.flight-info-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.flight-info-item.highlight {
+  border-left-color: #fbbf24;
+  background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+}
+
+.info-label {
+  display: block;
+  font-weight: 700;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.info-value {
+  display: block;
+  font-size: 1.1rem;
+  color: #023047;
+  font-weight: 600;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 2px dashed #00b4d8;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  color: #00b4d8;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 /* Booking Modal */
 .modal-overlay {
   position: fixed;
@@ -3014,6 +3624,64 @@ footer.footer {
   background: #fef3c7;
   border: 1px solid #fde68a;
 }
+
+/* Responsive Design for Destination Details */
+@media (max-width: 768px) {
+  .places-grid,
+  .hotels-grid,
+  .flights-info {
+    grid-template-columns: 1fr;
+  }
+
+  .destination-hero {
+    height: 250px;
+    margin-bottom: 1.5rem;
+  }
+
+  .destination-hero-overlay h1 {
+    font-size: 1.8rem;
+  }
+
+  .destination-main-info h2,
+  .places-section h2,
+  .hotels-section h2,
+  .flights-section h2,
+  .reviews-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .destination-quick-info {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .place-card img {
+    height: 150px;
+  }
+
+  .hotel-card-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .hotel-rating {
+    margin-left: 0;
+  }
+
+  .btn-book-trip {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .flights-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .flight-info-item {
+    padding: 1rem 1.25rem;
+  }
+}
+
 @media (max-width: 640px) {
   .payment-modal,
   .upi-pin-modal {

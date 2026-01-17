@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/MapExperience.css';
 
-// Free stack: OpenStreetMap tiles via Leaflet, nearby via Overpass, routes via OpenRouteService (requires free key)
+// Free stack: OpenStreetMap tiles via Leaflet, routes via OpenRouteService (requires free key)
 const centerDefault = { lat: 12.9716, lng: 77.5946 };
-const overpassUrl = 'https://overpass-api.de/api/interpreter';
 const orsKey = import.meta.env.VITE_ORS_API_KEY || 'YOUR_ORS_API_KEY';
 
 const MapExperience = () => {
@@ -13,13 +12,6 @@ const MapExperience = () => {
   const [mode, setMode] = useState('map');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
-  const [filterType, setFilterType] = useState('hospital');
-
-  const filterOptions = [
-    { value: 'hospital', label: 'Hospitals' },
-    { value: 'hotel', label: 'Hotels' },
-    { value: 'restaurant', label: 'Restaurants' }
-  ];
 
   // Inject Leaflet CSS/JS from CDN once, then init map
   useEffect(() => {
@@ -80,11 +72,10 @@ const MapExperience = () => {
     setStatus('Showing base map');
   };
 
-  const handleNearby = () => {
+  const handleLocate = () => {
     if (!mapInstance.current || !navigator.geolocation) return;
     setLoading(true);
-    setStatus(`Requesting location...`);
-    clearOverlays();
+    setStatus('Requesting location...');
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -96,36 +87,8 @@ const MapExperience = () => {
           .openPopup();
         overlays.current.push(userMarker);
         mapInstance.current.setView([lat, lng], 14);
-        setStatus(`Fetching nearby ${filterOptions.find(f => f.value === filterType)?.label.toLowerCase()} (2km)...`);
-
-        const amenityMap = {
-          hospital: 'hospital',
-          hotel: 'hotel',
-          restaurant: 'restaurant'
-        };
-
-        const query = `
-          [out:json];
-          node["amenity"="${amenityMap[filterType]}"](around:2000, ${lat}, ${lng});
-          out;
-        `;
-
-        fetch(overpassUrl, {
-          method: 'POST',
-          body: query,
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            (data.elements || []).forEach((place) => {
-              const marker = window.L.marker([place.lat, place.lon])
-                .addTo(mapInstance.current)
-                .bindPopup(place.tags?.name || filterOptions.find(f => f.value === filterType)?.label);
-              overlays.current.push(marker);
-            });
-            setStatus(`${(data.elements || []).length} ${filterOptions.find(f => f.value === filterType)?.label.toLowerCase()} found`);
-          })
-          .catch(() => setStatus('Failed to load nearby places'))
-          .finally(() => setLoading(false));
+        setStatus('Showing your location');
+        setLoading(false);
       },
       () => {
         setLoading(false);
@@ -192,7 +155,7 @@ const MapExperience = () => {
   return (
     <div className="map-experience-container">
       <div className="map-experience-header">
-        <h2>🗺️ Map, Nearby, Routes</h2>
+        <h2>🗺️ Map & Routes</h2>
       </div>
 
       <div className="map-content">
@@ -204,13 +167,6 @@ const MapExperience = () => {
             Map
           </button>
           <button 
-            onClick={() => { setMode('nearby'); handleNearby(); }}
-            disabled={loading}
-            className={mode === 'nearby' ? 'active' : ''}
-          >
-            Nearby
-          </button>
-          <button 
             onClick={() => setMode('routes')}
             className={mode === 'routes' ? 'active' : ''}
           >
@@ -218,20 +174,9 @@ const MapExperience = () => {
           </button>
         </div>
 
-        {mode === 'nearby' && (
-          <div className="map-filter-nav">
-            {filterOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => {
-                  setFilterType(opt.value);
-                  handleNearby();
-                }}
-                className={filterType === opt.value ? 'active' : ''}
-              >
-                {opt.label}
-              </button>
-            ))}
+        {mode === 'map' && (
+          <div className="map-actions">
+            <button onClick={handleLocate} disabled={loading}>Show My Location</button>
           </div>
         )}
 
@@ -254,7 +199,7 @@ const MapExperience = () => {
         </div>
 
         <div className="map-info">
-          💡 <strong>Nearby</strong> uses your geolocation to find hospitals within 2km. <strong>Routes</strong> uses OpenRouteService (free tier). Enter coordinates as <code>latitude,longitude</code>.
+          💡 <strong>Routes</strong> uses OpenRouteService (free tier). Enter coordinates as <code>latitude,longitude</code>.
         </div>
       </div>
     </div>

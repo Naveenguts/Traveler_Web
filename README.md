@@ -12,7 +12,14 @@ A complete travel planning application with **production-ready security features
 - 👤 User profiles
 - ⭐ Wishlist destinations
 
-### 🔐 Security Features (NEW!)
+### 🌐 Real-Time APIs (NEW! - Production Ready)
+- 🏛️ **Famous Places** - Google Places API integration
+- 🏨 **Live Hotels** - Real hotel availability & pricing (Amadeus)
+- ✈️ **Real Flights** - Flight search with live prices (Amadeus)
+- 🌦️ **Weather** - Real-time weather data (OpenWeatherMap)
+- 🌍 **Country Info** - Currency, timezone, languages (REST Countries)
+
+### 🔐 Security Features
 - ✅ **Backend-Driven Password Change** - Bcrypt hashing, session invalidation
 - ✅ **Two-Factor Authentication (2FA)** - TOTP with authenticator apps
 - ✅ **Login Alerts** - Email notifications for new devices
@@ -409,6 +416,50 @@ Before deploying:
 - [ ] Database backups enabled
 - [ ] Review all environment variables
 - [ ] Test all security features
+
+## 📊 Real-Time APIs Integration
+
+Your travel website now includes production-ready integration with **industry-standard APIs** used by Booking.com, Airbnb, and TripAdvisor:
+
+### Integrated APIs
+- **Google Places API** - Real attractions, ratings, photos
+- **Amadeus Travel API** - Live hotel availability & flight search
+- **OpenWeatherMap API** - Real-time weather data
+- **REST Countries API** - Country information (no key needed)
+
+### Architecture
+```
+Frontend (React)
+    ↓ HTTP Requests
+Backend (Node.js/Express) - API Gateway (Secure)
+    ↓ API calls with keys (hidden in .env)
+External APIs (Real-time data)
+```
+
+### Getting Started with APIs
+
+**See**: [INDEX.md](INDEX.md) - Complete documentation index  
+**Quick Start**: [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - 1-page cheat sheet  
+**Full Guide**: [EXTERNAL_APIS_SETUP.md](EXTERNAL_APIS_SETUP.md) - Complete setup guide  
+**Examples**: [INTEGRATION_EXAMPLE.js](INTEGRATION_EXAMPLE.js) - Code samples  
+**Architecture**: [ARCHITECTURE_AND_IMPLEMENTATION.md](ARCHITECTURE_AND_IMPLEMENTATION.md) - Technical details  
+
+### Quick Setup (10 minutes)
+1. Get free API keys from Google Cloud, Amadeus, OpenWeatherMap
+2. Add to `.env` file
+3. Restart backend
+4. Endpoints available at `/api/external/*`
+
+### What You Can Do
+- ✅ Display real attractions with Google ratings
+- ✅ Show live hotel availability & prices
+- ✅ Search real flights from major airlines
+- ✅ Display real-time weather
+- ✅ Show country information (capital, currency, timezone)
+
+**Status**: ✅ Backend infrastructure ready, awaiting API keys
+
+---
 
 ## 📊 Tech Stack
 
