@@ -83,9 +83,12 @@ const TermsPrivacy = () => {
           </p>
         </section>
 
-        <div className="help-card" style={{ marginTop: '2rem' }}>
-          <h3>Questions about our Terms or Privacy?</h3>
-          <p>Contact our legal team at legal@travelerapp.com</p>
+        <div className="help-card premium-card">
+          <div className="help-card-content">
+            <h3>📋 Questions about our Terms or Privacy?</h3>
+            <p>Contact our legal team at legal@travelerapp.com or use the contact form.</p>
+          </div>
+          <div className="help-card-icon">⚖️</div>
         </div>
       </div>
     </div>

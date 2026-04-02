@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -9,21 +10,36 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Rate limiting middleware
+const isLocalRequest = (req) => {
+  const ip = String(req.ip || '');
+  const host = String(req.hostname || '');
+  return ip.includes('127.0.0.1')
+    || ip.includes('::1')
+    || ip.includes('::ffff:127.0.0.1')
+    || host === 'localhost';
+};
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === 'development' ? 5000 : 500,
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => process.env.NODE_ENV === 'development' && isLocalRequest(req)
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increased limit for image uploads
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Disable caching for all responses
-app.use((req, res, next) => {
-  res.set({
-    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0',
-    'ETag': 'none'
-  });
-  next();
-});
+// Apply rate limiting ONLY to external APIs (not auth, general routes)
+app.use('/api/external', apiLimiter);
+
+// ✅ FIXED: Removed global no-cache middleware (was causing forced re-requests)
+// Browser & proxies were re-requesting EVERYTHING despite backend caching
+// Caching is now handled per-route with proper TTLs
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -34,6 +50,7 @@ const securityRoutes = require('./routes/security');
 const blogRoutes = require('./routes/blogs');
 const reviewRoutes = require('./routes/reviews');
 const externalApiRoutes = require('./routes/external-apis');
+const activityRoutes = require('./routes/activities');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationRoutes);
@@ -43,6 +60,7 @@ app.use('/api/external', externalApiRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/activities', activityRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

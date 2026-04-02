@@ -5,6 +5,12 @@
 ### 1. Free API Signup (Get Your Keys!)
 
 ```
+📌 Pexels API ⭐⭐⭐⭐⭐ (5 min)
+   → https://www.pexels.com/api/
+   → Sign up / login → Copy API Key
+   → Free & high-quality travel photos
+   → Works reliably after deployment
+
 📌 Google Places API (5 min)
    → https://console.cloud.google.com
    → Create project → Enable "Places API" → Copy API Key
@@ -27,6 +33,7 @@
 Edit `traveler-backend/.env`:
 
 ```env
+PEXELS_API_KEY=YOUR_PEXELS_API_KEY_HERE
 GOOGLE_PLACES_API_KEY=pk_XXXXXXXXXXXXX
 AMADEUS_CLIENT_ID=YOUR_ID_HERE
 AMADEUS_CLIENT_SECRET=YOUR_SECRET_HERE
@@ -45,6 +52,11 @@ GOOGLE_MAPS_API_KEY=YOUR_KEY_HERE
 ```javascript
 // ✅ Works without key (REST Countries)
 fetch('http://localhost:5000/api/external/country-info/France')
+  .then(r => r.json())
+  .then(d => console.log(d))
+
+// ✅ Works with Pexels API key
+fetch('http://localhost:5000/api/external/pexels?query=Paris&per_page=1')
   .then(r => r.json())
   .then(d => console.log(d))
 
@@ -77,6 +89,25 @@ fetch('http://localhost:5000/api/external/location-codes/Paris')
   }
 }
 ```
+
+### Pexels Images (High Quality!)
+```json
+{
+  "success": true,
+  "image": "https://images.pexels.com/photos/.../pexels-photo.jpeg",
+  "images": [
+    {
+      "large": "https://images.pexels.com/photos/.../large.jpeg",
+      "medium": "https://images.pexels.com/photos/.../medium.jpeg",
+      "photographer": "John Doe",
+      "alt": "Paris cityscape"
+    }
+  ],
+  "source": "pexels"
+}
+```
+✅ **Pros**: Free, high-quality, works after deployment, reliable
+✅ **Perfect for college projects**
 
 ### Famous Places (Google Places)
 ```json
@@ -160,11 +191,15 @@ fetch('http://localhost:5000/api/external/location-codes/Paris')
 Edit `frontend/src/pages/DestinationDetails.jsx`:
 
 ```javascript
-import externalAPI from '../services/externalApiService';
+import pexelsService from '../services/unsplashService';
 
 // In useEffect hook:
 const fetchData = async () => {
   try {
+    // Get Pexels image (high quality!)
+    const image = await pexelsService.getDestinationImage(destination.name);
+    console.log('Pexels Image:', image);
+
     // Get famous places
     const places = await externalAPI.getPlaces(destination.name);
     console.log('Places:', places);
@@ -180,6 +215,15 @@ const fetchData = async () => {
     console.error('API Error:', error);
   }
 };
+```
+
+### Quick Test:
+```javascript
+// Test Pexels API (get amazing travel photos!)
+fetch('http://localhost:5000/api/external/pexels?query=Paris&per_page=1')
+  .then(r => r.json())
+  .then(d => console.log('Image:', d
+  .then(d => console.log('Image:', d.data.image));
 ```
 
 ---

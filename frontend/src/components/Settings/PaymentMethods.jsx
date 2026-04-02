@@ -33,6 +33,14 @@ const PaymentMethods = () => {
   const [pendingActionData, setPendingActionData] = useState(null);
   const [userSettings, setUserSettings] = useState({ twoFAEnabled: false });
 
+  const getCardThemeClass = (brand) => {
+    const normalized = (brand || '').toLowerCase();
+    if (normalized.includes('visa')) return 'visa-theme';
+    if (normalized.includes('mastercard')) return 'mastercard-theme';
+    if (normalized.includes('amex')) return 'amex-theme';
+    return 'default-theme';
+  };
+
   const authHeaders = useMemo(() => (
     token ? { Authorization: `Bearer ${token}` } : {}
   ), [token]);
@@ -253,13 +261,15 @@ const PaymentMethods = () => {
       <div className="settings-header">
         <h2>Payment Methods</h2>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary micro-btn"
           onClick={() => setShowAddForm(!showAddForm)}
           disabled={!stripe}
         >
           {showAddForm ? 'Cancel' : '+ Add Payment Method'}
         </button>
       </div>
+
+      <div className="section-divider"></div>
 
       {message && (
         <div className="payment-alert">
@@ -286,22 +296,41 @@ const PaymentMethods = () => {
             </div>
           </div>
 
-          <button className="btn btn-primary" onClick={handleAddPayment} disabled={saving || !stripe}>
-            {saving ? 'Saving...' : 'Add Card'}
+          <button className="btn btn-primary micro-btn" onClick={handleAddPayment} disabled={saving || !stripe}>
+            {saving ? (
+              <>
+                <span className="spinner" aria-hidden="true"></span>
+                Saving...
+              </>
+            ) : (
+              'Add Card'
+            )}
           </button>
           <p className="hint">Use test card 4242 4242 4242 4242, any future expiry, any CVC.</p>
         </div>
       )}
 
       <div className="payment-list">
-        {loading && <div>Loading payment methods...</div>}
+        {loading && (
+          <div className="payment-skeleton-grid">
+            <div className="payment-skeleton-card"></div>
+            <div className="payment-skeleton-card"></div>
+          </div>
+        )}
         {!loading && paymentMethods.length === 0 && (
-          <div className="empty-state">No payment methods yet. Add one to get started.</div>
+          <div className="empty-state payment-empty-state">
+            <div className="empty-state-icon" aria-hidden="true">💳</div>
+            <h3>No payment methods added</h3>
+            <p>Securely add a card to enable quick checkout.</p>
+            <button className="btn btn-primary micro-btn" onClick={() => setShowAddForm(true)}>
+              Add Payment Method
+            </button>
+          </div>
         )}
         {paymentMethods.map((payment) => (
-          <div key={payment._id} className="payment-card">
+          <div key={payment._id} className={`payment-card realistic-card ${getCardThemeClass(payment.brand)}`}>
             <div className="payment-info">
-              <div className="payment-type">{payment.brand || 'Card'}</div>
+              <div className="payment-type">{(payment.brand || 'Card').toUpperCase()}</div>
               <div className="payment-number">•••• •••• •••• {payment.last4}</div>
               <div className="payment-expiry">Expires: {payment.expMonth}/{payment.expYear}</div>
             </div>
@@ -309,14 +338,14 @@ const PaymentMethods = () => {
               {payment.isDefault && <span className="default-badge">Default</span>}
               {!payment.isDefault && (
                 <button
-                  className="btn-link"
+                  className="btn-link micro-btn"
                   onClick={() => handleSetDefault(payment._id)}
                 >
                   Set as Default
                 </button>
               )}
               <button
-                className="btn-delete"
+                className="btn-delete micro-btn"
                 onClick={() => handleDeletePayment(payment._id)}
               >
                 Delete

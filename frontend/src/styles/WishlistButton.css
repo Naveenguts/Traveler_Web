@@ -2,31 +2,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: none;
-  background-color: transparent;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 18px;
   padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .wishlist-button:hover {
-  transform: scale(1.2);
+  transform: scale(1.12);
+  background: #fef2f2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .star-icon {
   display: block;
-  color: #ddd;
+  color: #d1d5db;
   transition: all 0.3s ease;
   filter: drop-shadow(0 0 0px transparent);
+  line-height: 1;
 }
 
 .wishlist-button.active .star-icon {
-  color: #fbbf24;
+  color: #f59e0b;
   animation: starShine 0.6s ease;
-  filter: drop-shadow(0 0 8px #fbbf24);
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+}
+
+.wishlist-button.active {
+  background: #fffbeb;
+}
+
+.wishlist-button.active:hover {
+  background: #fef3c7;
 }
 
 @keyframes starShine {

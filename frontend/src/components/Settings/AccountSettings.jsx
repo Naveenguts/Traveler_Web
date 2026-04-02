@@ -14,6 +14,7 @@ const AccountSettings = () => {
     dateOfBirth: user?.dateOfBirth ? user.dateOfBirth.substring(0, 10) : ''
   });
   const [status, setStatus] = useState('');
+  const [statusType, setStatusType] = useState('success');
   const [saving, setSaving] = useState(false);
 
   // Check token validity on component mount
@@ -21,6 +22,7 @@ const AccountSettings = () => {
     const verifyToken = async () => {
       if (!token) {
         setStatus('Please log in to access account settings.');
+        setStatusType('error');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
@@ -38,6 +40,7 @@ const AccountSettings = () => {
         if (res.status === 401) {
           const data = await res.json();
           setStatus(data?.message || 'Session expired. Please log in again.');
+          setStatusType('error');
           setTimeout(() => {
             logout();
             navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
@@ -91,6 +94,7 @@ const AccountSettings = () => {
   const handleSave = async () => {
     if (!token) {
       setStatus('Please log in again to update your profile.');
+      setStatusType('error');
       return;
     }
     setSaving(true);
@@ -114,6 +118,7 @@ const AccountSettings = () => {
       // Handle token expiration
       if (res.status === 401 && data?.message?.toLowerCase().includes('token expired')) {
         setStatus('Your session has expired. Redirecting to login...');
+        setStatusType('error');
         setTimeout(() => {
           logout();
           navigate('/login', { state: { message: 'Session expired. Please log in again.' } });
@@ -135,8 +140,10 @@ const AccountSettings = () => {
       try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
       setIsEditing(false);
       setStatus('Profile updated and saved.');
+      setStatusType('success');
     } catch (err) {
       setStatus(err.message);
+      setStatusType('error');
     } finally {
       setSaving(false);
     }
@@ -147,12 +154,21 @@ const AccountSettings = () => {
       <div className="settings-header">
         <h2>Account Settings</h2>
         <button 
-          className="btn-edit"
+          className="btn-edit micro-btn"
           onClick={() => setIsEditing(!isEditing)}
         >
           {isEditing ? 'Cancel' : 'Edit'}
         </button>
       </div>
+
+      {status && (
+        <div className={`toast-notification inline-toast ${statusType === 'error' ? 'toast-error' : 'toast-success'}`}>
+          <span className="toast-icon" aria-hidden="true">{statusType === 'error' ? '⚠️' : '✅'}</span>
+          <span>{status}</span>
+        </div>
+      )}
+
+      <div className="section-divider"></div>
 
       <div className="settings-form">
         <div className="form-group">
@@ -205,12 +221,17 @@ const AccountSettings = () => {
         </div>
 
         {isEditing && (
-          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving...' : 'Save Changes'}
+          <button className="btn btn-primary micro-btn" onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <span className="spinner" aria-hidden="true"></span>
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         )}
-
-        {status && <p className="settings-status">{status}</p>}
       </div>
     </div>
   );

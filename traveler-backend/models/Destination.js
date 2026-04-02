@@ -19,9 +19,17 @@ const destinationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  fullDescription: {
+    type: String,
+    default: ''
+  },
   image: {
     type: String,
     required: true
+  },
+  galleryImages: {
+    type: [String],
+    default: []
   },
   price: {
     type: Number,
@@ -32,6 +40,78 @@ const destinationSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1
+  },
+  highlights: {
+    type: [String],
+    default: []
+  },
+  includes: {
+    included: {
+      type: [String],
+      default: []
+    },
+    excluded: {
+      type: [String],
+      default: []
+    }
+  },
+  importantInfo: {
+    whatToBring: {
+      type: [String],
+      default: []
+    },
+    notAllowed: {
+      type: [String],
+      default: []
+    }
+  },
+  bookingInfo: {
+    duration: {
+      type: String,
+      default: ''
+    },
+    cancellationPolicy: {
+      type: String,
+      default: ''
+    },
+    reserveNowPayLater: {
+      type: Boolean,
+      default: false
+    },
+    originalPrice: {
+      type: Number,
+      min: 0
+    },
+    discountedPrice: {
+      type: Number,
+      min: 0
+    },
+    mealsIncluded: {
+      type: [String],
+      default: []
+    }
+  },
+  famousFoods: {
+    type: [{
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      description: {
+        type: String,
+        default: ''
+      },
+      bestPlace: {
+        type: String,
+        default: ''
+      }
+    }],
+    default: []
+  },
+  topRestaurants: {
+    type: [String],
+    default: []
   },
   averageRating: {
     type: Number,

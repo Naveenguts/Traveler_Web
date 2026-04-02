@@ -33,18 +33,27 @@
 
 .search-input {
   width: 100%;
-  padding: 14px 20px;
+  padding: 16px 20px;
   font-size: 16px;
-  border: 2px solid #ddd;
+  border: 2px solid #4f6ef7;
   border-radius: 8px;
   outline: none;
   transition: all 0.3s ease;
-  background-color: white;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(79, 110, 247, 0.12);
+  color: #333;
+  font-weight: 500;
+}
+
+.search-input::placeholder {
+  color: #666;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .search-input:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15), 0 2px 12px rgba(37, 99, 235, 0.25);
 }
 
 .blogs-container {

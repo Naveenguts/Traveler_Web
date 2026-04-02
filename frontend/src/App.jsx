@@ -8,6 +8,7 @@ import './styles/AboutUs.css';
 import Home from './pages/Home';
 import Destinations from './pages/Destinations';
 import DestinationDetails from './pages/DestinationDetails';
+import ActivityDetail from './pages/ActivityDetail';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import WriteBlog from './pages/WriteBlog';
@@ -23,10 +24,13 @@ import Settings from './pages/Settings';
 import SupportInfo from './pages/SupportInfo';
 import Help from './pages/Help';
 import FAQs from './pages/FAQs';
+import FAQArticle from './pages/FAQArticle';
 import ContactUs from './pages/ContactUs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import MapExperience from './pages/MapExperience';
 import Explore from './pages/Explore';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
 
 const App = () => {
   return (
@@ -38,6 +42,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/destinations/:id" element={<DestinationDetails />} />
+          <Route path="/activities/:id" element={<ActivityDetail />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blogs/write" element={<WriteBlog />} />
           <Route path="/blogs/:id" element={<BlogDetail />} />
@@ -48,10 +53,13 @@ const App = () => {
           <Route path="/explore" element={<Explore />} />
           <Route path="/help" element={<Help />} />
           <Route path="/faqs" element={<FAQs />} />
+          <Route path="/faqs/article/:slug" element={<FAQArticle />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/contacts" element={<ContactUs />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-failed" element={<PaymentFailed />} />
           
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

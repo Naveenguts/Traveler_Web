@@ -218,6 +218,10 @@ MONGODB_URI=mongodb://localhost:27017/traveler-app
 NODE_ENV=development
 ```
 
+### Tripadvisor Restaurants City Mapping
+- Update Tripadvisor location IDs in `config/tripadvisorLocationMap.js`.
+- Add new cities there to expand restaurants API coverage without editing route handlers.
+
 ### MongoDB Atlas (Cloud Database)
 To use MongoDB Atlas instead of local:
 

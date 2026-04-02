@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 const HelpCenter = ({ onContactClick }) => {
   const [openFaq, setOpenFaq] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [copied, setCopied] = useState(null);
 
   const faqs = [
     {
@@ -31,8 +33,19 @@ const HelpCenter = ({ onContactClick }) => {
     },
   ];
 
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const toggleFaq = (id) => {
     setOpenFaq(openFaq === id ? null : id);
+  };
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText('support@travelerapp.com');
+    setCopied('email');
+    setTimeout(() => setCopied(null), 2000);
   };
 
   return (
@@ -40,35 +53,95 @@ const HelpCenter = ({ onContactClick }) => {
       <h2>FAQs</h2>
       <p className="section-subtitle">Find quick answers to common questions</p>
 
-      <div className="faq-list">
-        {faqs.map((faq) => (
-          <div key={faq.id} className="faq-item">
-            <button
-              className={`faq-question ${openFaq === faq.id ? 'active' : ''}`}
-              onClick={() => toggleFaq(faq.id)}
-            >
-              <span>{faq.question}</span>
-              <span className="faq-icon">{openFaq === faq.id ? '−' : '+'}</span>
-            </button>
-            {openFaq === faq.id && (
-              <div className="faq-answer">
-                {faq.answer}
-              </div>
-            )}
-          </div>
-        ))}
+      <div className="faq-search-wrapper">
+        <input
+          type="text"
+          placeholder="Search FAQs..."
+          className="faq-search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          aria-label="Search FAQ questions"
+        />
+        {searchTerm && (
+          <button
+            className="faq-search-clear"
+            onClick={() => setSearchTerm('')}
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
-      <div className="help-card">
-        <h3>Still need help?</h3>
-        <p>Our support team is available 24/7 to assist you.</p>
-        <button
-          className="btn btn-primary"
-          onClick={onContactClick}
-          aria-label="Contact Support"
-        >
-          Contact Support
-        </button>
+      <div className="faq-list">
+        {filteredFaqs.length > 0 ? (
+          filteredFaqs.map((faq) => (
+            <div key={faq.id} className={`faq-item ${openFaq === faq.id ? 'active' : ''}`}>
+              <button
+                className={`faq-question ${openFaq === faq.id ? 'active' : ''}`}
+                onClick={() => toggleFaq(faq.id)}
+                aria-expanded={openFaq === faq.id}
+              >
+                <span>{faq.question}</span>
+                <span className="faq-icon">{openFaq === faq.id ? '−' : '+'}</span>
+              </button>
+              {openFaq === faq.id && (
+                <div className="faq-answer" role="region">
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="faq-no-results">
+            <p>No FAQs found matching your search.</p>
+            <p className="faq-no-results-hint">Try different keywords or contact us for help.</p>
+          </div>
+        )}
+      </div>
+
+      <div className="help-card premium-card">
+        <div className="help-card-content">
+          <h3>💬 Still need help?</h3>
+          <p>Our support team is available 24/7 to assist you with any questions or concerns.</p>
+          <div className="help-card-actions">
+            <button
+              className="btn btn-primary premium-btn"
+              onClick={onContactClick}
+              aria-label="Contact Support"
+            >
+              Contact Support
+            </button>
+            <div className="quick-contact">
+              <a
+                href="mailto:support@travelerapp.com"
+                className="email-link"
+                title="Email us"
+              >
+                📧 Email
+              </a>
+              <a href="tel:+18008732835" className="phone-link" title="Call us">
+                📞 Call 1-800-TRAVEL
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="help-card-icon">🎯</div>
+      </div>
+
+      <div className="quick-stats">
+        <div className="stat-card">
+          <span className="stat-number">24/7</span>
+          <span className="stat-label">Support</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-number">1min</span>
+          <span className="stat-label">Avg Response</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-number">4.9★</span>
+          <span className="stat-label">Customer Rating</span>
+        </div>
       </div>
     </div>
   );

@@ -156,6 +156,7 @@ const MapExperience = () => {
     <div className="map-experience-container">
       <div className="map-experience-header">
         <h2>🗺️ Map & Routes</h2>
+        <p className="map-page-subtitle">Explore destinations and generate smart routes with real-time navigation</p>
       </div>
 
       <div className="map-content">
@@ -189,17 +190,20 @@ const MapExperience = () => {
         )}
 
         <div className="map-status" style={{ display: loading ? 'flex' : 'none' }}>
-          ⏳ Loading...
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <span className="loading-text">Loading...</span>
+          </div>
         </div>
 
         <div id="map" className="map-container" ref={mapRef} />
 
         <div className="map-status">
-          {status || 'Ready'}
+          {status || '✅ Ready to explore'}
         </div>
 
         <div className="map-info">
-          💡 <strong>Routes</strong> uses OpenRouteService (free tier). Enter coordinates as <code>latitude,longitude</code>.
+          💡 <strong>Routes</strong> uses OpenRouteService (free tier). Enter coordinates as <code>latitude,longitude</code> (e.g., 12.9716,77.5946).
         </div>
       </div>
     </div>

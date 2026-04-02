@@ -27,6 +27,7 @@ const Security = () => {
   const [show2FAVerification, setShow2FAVerification] = useState(false);
   const [pendingSensitiveAction, setPendingSensitiveAction] = useState(null);
   const [pendingActionData, setPendingActionData] = useState(null);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   useEffect(() => {
     fetchSecuritySettings();
@@ -161,6 +162,22 @@ const Security = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getPasswordStrengthClass = () => {
+    const strength = passwordStrength.toLowerCase();
+    if (strength === 'weak') return 'weak';
+    if (strength === 'fair') return 'medium';
+    if (strength === 'good' || strength === 'strong') return 'strong';
+    return 'weak';
+  };
+
+  const requestPasswordUpdate = () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      showMessage('Please fill in all password fields', 'error');
+      return;
+    }
+    setShowPasswordConfirm(true);
   };
 
   const handleSetup2FA = async () => {
@@ -387,7 +404,7 @@ const Security = () => {
         <div className="section-header">
           <h3>Change Password</h3>
           <button 
-            className="btn-edit"
+            className="btn-edit micro-btn"
             onClick={() => setShowPasswordForm(!showPasswordForm)}
             disabled={loading}
           >
@@ -420,9 +437,14 @@ const Security = () => {
                 disabled={loading}
               />
               {passwordData.newPassword && (
-                <div className={`password-strength ${passwordStrength.toLowerCase()}`}>
-                  Strength: <strong>{passwordStrength}</strong>
-                </div>
+                <>
+                  <div className="strength-bar" role="progressbar" aria-label="Password strength indicator">
+                    <div className={`strength-fill ${getPasswordStrengthClass()}`}></div>
+                  </div>
+                  <div className={`password-strength ${passwordStrength.toLowerCase()}`}>
+                    Strength: <strong>{passwordStrength}</strong>
+                  </div>
+                </>
               )}
             </div>
 
@@ -439,33 +461,56 @@ const Security = () => {
             </div>
 
             <button 
-              className="btn btn-primary" 
-              onClick={handleChangePassword}
+              className="btn btn-primary micro-btn" 
+              onClick={requestPasswordUpdate}
               disabled={loading}
             >
-              {loading ? 'Updating...' : 'Update Password'}
+              {loading ? (
+                <>
+                  <span className="spinner" aria-hidden="true"></span>
+                  Updating...
+                </>
+              ) : (
+                'Update Password'
+              )}
             </button>
           </div>
         )}
       </div>
 
+      <div className="section-divider"></div>
+
       {/* Two-Factor Authentication */}
       <div className="security-section">
         <div className="section-header">
           <h3>Two-Factor Authentication</h3>
+          <span className={`status-badge ${securitySettings.twoFAEnabled ? 'status-enabled' : 'status-disabled'}`}>
+            {securitySettings.twoFAEnabled ? 'Enabled' : 'Disabled'}
+          </span>
+        </div>
+        <div className="security-highlight-card">
+          <div>
+            <p className="section-desc" style={{ marginTop: 0 }}>
+              {securitySettings.twoFAEnabled 
+                ? '✓ Two-factor authentication is enabled. Your account is protected with an extra layer of security.'
+                : 'Two-factor authentication is disabled. Enable it for better security.'}
+            </p>
+          </div>
           <button 
-            className={`btn ${securitySettings.twoFAEnabled ? 'btn-danger' : 'btn-success'}`}
+            className={`btn micro-btn ${securitySettings.twoFAEnabled ? 'btn-danger' : 'btn-success'}`}
             onClick={securitySettings.twoFAEnabled ? handleDisable2FA : handleSetup2FA}
             disabled={loading}
           >
-            {securitySettings.twoFAEnabled ? 'Disable' : 'Enable'}
+            {loading ? (
+              <>
+                <span className="spinner" aria-hidden="true"></span>
+                Please wait...
+              </>
+            ) : (
+              securitySettings.twoFAEnabled ? 'Disable 2FA' : 'Enable 2FA'
+            )}
           </button>
         </div>
-        <p className="section-desc">
-          {securitySettings.twoFAEnabled 
-            ? '✓ Two-factor authentication is enabled. Your account is protected with an extra layer of security.'
-            : 'Two-factor authentication is disabled. Enable it for better security.'}
-        </p>
 
         {/* 2FA Setup Modal */}
         {show2FASetup && (
@@ -490,14 +535,21 @@ const Security = () => {
               />
             </div>
             <button 
-              className="btn btn-primary" 
+              className="btn btn-primary micro-btn" 
               onClick={handleVerify2FA}
               disabled={loading || otp.length !== 6}
             >
-              {loading ? 'Verifying...' : 'Verify & Enable'}
+              {loading ? (
+                <>
+                  <span className="spinner" aria-hidden="true"></span>
+                  Verifying...
+                </>
+              ) : (
+                'Verify & Enable'
+              )}
             </button>
             <button 
-              className="btn btn-secondary" 
+              className="btn btn-secondary micro-btn" 
               onClick={() => {
                 setShow2FASetup(false);
                 setQrCode('');
@@ -512,10 +564,19 @@ const Security = () => {
         )}
       </div>
 
+      <div className="section-divider"></div>
+
       {/* Login Alerts */}
       <div className="security-section">
-        <div className="section-header">
-          <h3>Login Alerts</h3>
+        <div className="security-card-row">
+          <div className="security-card-title-wrap">
+            <h3>Login Alerts</h3>
+            <p className="section-desc">
+              {securitySettings.loginAlerts 
+                ? 'You will receive alerts when your account is accessed from a new location or device.'
+                : 'Login alerts are disabled.'}
+            </p>
+          </div>
           <label className="toggle-switch">
             <input 
               type="checkbox"
@@ -526,51 +587,88 @@ const Security = () => {
             <span className="slider"></span>
           </label>
         </div>
-        <p className="section-desc">
-          {securitySettings.loginAlerts 
-            ? 'You will receive alerts when your account is accessed from a new location or device.'
-            : 'Login alerts are disabled.'}
-        </p>
       </div>
+
+      <div className="section-divider"></div>
 
       {/* Trusted Devices */}
       <div className="security-section">
-        <h3>Trusted Devices</h3>
+        <div className="section-header">
+          <h3>Active Sessions</h3>
+        </div>
         <div className="trusted-devices">
           {securitySettings.trustedDevices.length === 0 ? (
             <p className="no-devices">No trusted devices found. Login from a device to see it here.</p>
           ) : (
             securitySettings.trustedDevices.map(device => (
-              <div key={device._id} className="device-card">
+              <div key={device._id} className="device-card session-card">
                 <div className="device-info">
-                  <h4>{device.deviceName}</h4>
-                  <p className="device-location">
-                    📍 {device.location?.city ? 
-                      `${device.location.city}, ${device.location.country}` : 
-                      device.location?.country || 'Unknown Location'}
-                  </p>
-                  <p className="device-lastlogin">
-                    Last login: {formatDate(device.lastLogin)}
-                  </p>
-                  <p className="device-ip" style={{ fontSize: '12px', color: '#666' }}>
-                    IP: {device.ip}
-                  </p>
+                  <div className="session-top-row">
+                    <h4>🖥 {device.deviceName || 'Unknown Device'}</h4>
+                    {(device.ip === '::1' || device.ip === '127.0.0.1') && <span className="status-badge status-enabled">Current Device</span>}
+                  </div>
+                  <div className="session-meta-grid">
+                    <div className="session-chip chip-location">
+                      <span className="chip-icon" aria-hidden="true">📍</span>
+                      <span>
+                        {device.location?.city ? 
+                          `${device.location.city}, ${device.location.country}` : 
+                          device.location?.country || 'Unknown Location'}
+                      </span>
+                    </div>
+                    <div className="session-chip chip-time">
+                      <span className="chip-icon" aria-hidden="true">🕒</span>
+                      <span>Last active: {formatDate(device.lastLogin)}</span>
+                    </div>
+                    <div className="session-chip chip-ip">
+                      <span className="chip-icon" aria-hidden="true">🌐</span>
+                      <span>IP: {device.ip || 'N/A'}</span>
+                    </div>
+                  </div>
                 </div>
                 <button 
-                  className="btn-delete"
+                  className="btn-delete micro-btn"
                   onClick={() => handleRemoveDevice(device._id)}
                   disabled={loading}
                 >
-                  Remove
+                  Logout
                 </button>
               </div>
             ))
           )}
         </div>
         <p className="section-desc">
-          These are devices where you've recently logged in. Remove any devices you don't recognize.
+          These are currently active and recent sessions. Remove any device you don't recognize.
         </p>
       </div>
+
+      {showPasswordConfirm && (
+        <div className="security-modal-overlay" role="dialog" aria-modal="true" aria-label="Confirm password change">
+          <div className="security-confirm-modal">
+            <h4>Confirm Password Change</h4>
+            <p>This will update your account password and may require login verification.</p>
+            <div className="confirm-actions">
+              <button
+                className="btn btn-secondary micro-btn"
+                onClick={() => setShowPasswordConfirm(false)}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary micro-btn"
+                onClick={() => {
+                  setShowPasswordConfirm(false);
+                  handleChangePassword();
+                }}
+                disabled={loading}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

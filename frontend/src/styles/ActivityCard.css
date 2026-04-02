@@ -1,0 +1,306 @@
+/* Activity Card Styles */
+.activity-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.activity-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Image Container */
+.activity-card-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.activity-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.activity-card:hover .activity-image {
+  transform: scale(1.05);
+}
+
+.activity-image[src*="placeholder"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Badges */
+.discount-badge,
+.rating-badge-card,
+.free-cancel-badge {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+.discount-badge {
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.rating-badge-card {
+  top: 12px;
+  left: 12px;
+  background: rgba(251, 191, 36, 0.95);
+  color: #333;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rating-badge-card .stars {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.rating-badge-card .reviews {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.free-cancel-badge {
+  bottom: 12px;
+  left: 12px;
+  background: rgba(16, 185, 129, 0.95);
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+/* Card Content */
+.activity-card-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+/* Category */
+.activity-category {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #2563eb;
+  letter-spacing: 0.5px;
+}
+
+/* Title */
+.activity-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Location */
+.activity-location {
+  font-size: 13px;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta Info */
+.activity-meta-info {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #666;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* Description */
+.activity-description {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Features */
+.activity-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.feature-icon {
+  font-size: 14px;
+}
+
+/* Footer - Price & Button */
+.activity-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.activity-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.price-current {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.price-original {
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.price-per-person {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+}
+
+.btn-view-details {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.btn-view-details:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-view-details:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .activity-card {
+    border-radius: 8px;
+  }
+
+  .activity-card-image {
+    height: 160px;
+  }
+
+  .activity-card-content {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .activity-card-title {
+    font-size: 14px;
+  }
+
+  .activity-location {
+    font-size: 12px;
+  }
+
+  .activity-description {
+    font-size: 12px;
+  }
+
+  .btn-view-details {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .price-current {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .activity-card-image {
+    height: 140px;
+  }
+
+  .activity-card-content {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .activity-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .btn-view-details {
+    width: 100%;
+    padding: 8px 12px;
+  }
+
+  .activity-price {
+    align-items: stretch;
+  }
+}

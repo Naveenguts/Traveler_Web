@@ -1,13 +1,11 @@
 .contact-page {
   min-height: 100vh;
-  background: radial-gradient(circle at 18% 18%, rgba(90, 142, 192, 0.08), transparent 26%),
-    radial-gradient(circle at 78% 8%, rgba(74, 123, 167, 0.05), transparent 24%),
-    linear-gradient(to bottom, #f9fbff 0%, #eef3f9 100%);
+  background-color: var(--bg-light);
   padding-bottom: 60px;
 }
 
 .contact-hero {
-  background: linear-gradient(135deg, #4a7ba7 0%, #5a8ec0 100%);
+  background: linear-gradient(135deg, #1e3a8a, #2563eb, #3b82f6);
   color: white;
   padding: 70px 20px;
   text-align: center;
@@ -18,12 +16,14 @@
   font-size: 42px;
   margin: 0 0 10px 0;
   font-weight: 700;
+  color: #ffffff;
 }
 
 .contact-hero p {
   font-size: 18px;
   margin: 0;
-  opacity: 0.95;
+  opacity: 1;
+  color: #dbeafe;
 }
 
 .contact-container {
@@ -49,7 +49,7 @@
   border-radius: 12px;
   padding: 32px 26px;
   text-align: center;
-  box-shadow: 0 12px 32px rgba(24, 62, 102, 0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
   border: 1px solid rgba(74, 123, 167, 0.08);
 }
@@ -68,20 +68,20 @@
 .contact-method-card h3 {
   font-size: 18px;
   font-weight: 700;
-  color: #274866;
+  color: var(--text-dark);
   margin: 0 0 10px 0;
 }
 
 .method-description {
   font-size: 13px;
-  color: #5b6b7a;
+  color: var(--text-light);
   margin: 0 0 8px 0;
 }
 
 .method-details {
   font-size: 14px;
   font-weight: 600;
-  color: #4a7ba7;
+  color: var(--accent);
   margin: 0;
 }
 
@@ -90,7 +90,7 @@
   background: #ffffff;
   border-radius: 12px;
   padding: 42px;
-  box-shadow: 0 16px 42px rgba(24, 62, 102, 0.14);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   grid-column: 1;
   border: 1px solid rgba(74, 123, 167, 0.08);
 }
@@ -98,7 +98,7 @@
 .contact-form-section h2 {
   font-size: 26px;
   font-weight: 700;
-  color: #223449;
+  color: var(--text-dark);
   margin: 0 0 24px 0;
 }
 
@@ -121,7 +121,7 @@
 .form-group label {
   display: block;
   font-weight: 600;
-  color: #2f3f52;
+  color: var(--text-dark);
   margin-bottom: 8px;
 }
 
@@ -142,8 +142,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4a7ba7;
-  box-shadow: 0 0 0 4px rgba(74, 123, 167, 0.12);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
   transform: translateY(-1px);
 }
 
@@ -154,7 +154,7 @@
 
 .submit-button {
   padding: 12px 30px;
-  background: linear-gradient(135deg, #5a8ec0 0%, #4a7ba7 100%);
+  background-color: #2563eb;
   color: white;
   border: none;
   border-radius: 10px;
@@ -167,6 +167,7 @@
 }
 
 .submit-button:hover {
+  background-color: #1d4ed8;
   transform: translateY(-2px);
   box-shadow: 0 16px 36px rgba(24, 62, 102, 0.22);
 }
@@ -182,7 +183,7 @@
   background: #ffffff;
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 16px 42px rgba(24, 62, 102, 0.14);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -193,13 +194,13 @@
 .contact-faq-section h2 {
   font-size: 26px;
   font-weight: 700;
-  color: #223449;
+  color: var(--text-dark);
   margin: 0 0 12px 0;
 }
 
 .contact-faq-section p {
   font-size: 14px;
-  color: #5b6b7a;
+  color: var(--text-light);
   margin: 0 0 22px 0;
   line-height: 1.6;
 }
@@ -212,7 +213,7 @@
 
 .contact-button {
   padding: 12px 20px;
-  background: linear-gradient(135deg, #5a8ec0 0%, #4a7ba7 100%);
+  background-color: #2563eb;
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -224,19 +225,20 @@
 }
 
 .contact-button:hover {
+  background-color: #1d4ed8;
   transform: translateY(-2px);
   box-shadow: 0 16px 36px rgba(24, 62, 102, 0.2);
 }
 
 .contact-button-secondary {
   background: #ffffff;
-  color: #4a7ba7;
-  border: 1px solid rgba(74, 123, 167, 0.4);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.45);
   box-shadow: none;
 }
 
 .contact-button-secondary:hover {
-  background: #4a7ba7;
+  background: #1d4ed8;
   color: white;
   box-shadow: 0 12px 28px rgba(24, 62, 102, 0.16);
 }

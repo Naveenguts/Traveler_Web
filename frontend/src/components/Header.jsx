@@ -143,7 +143,10 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <h1>Traveler App</h1>
+        <Link to="/" className="header-logo-link">
+          <img src="/assets/favicon.svg" alt="Traveler Logo" className="header-logo" />
+          <h1>Traveler</h1>
+        </Link>
         <nav className="main-nav">
           <Link to="/">Home</Link>
           <Link to="/destinations">Destinations</Link>

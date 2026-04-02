@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HelpCenter from '../components/Support/HelpCenter';
 import ContactSupport from '../components/Support/ContactSupport';
 import SafetyTips from '../components/Support/SafetyTips';
@@ -22,18 +22,27 @@ const SupportInfo = () => {
     }
   };
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
   return (
-    <div className="settings-page">
+    <div className="settings-page support-page">
       <div className="settings-header-main">
-        <h1>Support & Info</h1>
-        <p>Get help, contact support, and learn about safety and policies</p>
+        <div className="header-top">
+          <div>
+            <h1>Support & Info</h1>
+            <p>Get help, contact support, and learn about safety and policies</p>
+          </div>
+        </div>
       </div>
 
       <div className="settings-content">
-        <div className="settings-sidebar">
+        <nav className="settings-sidebar" role="navigation" aria-label="Support sections">
           <button
             className={`sidebar-item ${activeTab === 'help' ? 'active' : ''}`}
-            onClick={() => setActiveTab('help')}
+            onClick={() => handleTabChange('help')}
+            aria-current={activeTab === 'help' ? 'page' : undefined}
           >
             <span className="icon">❓</span>
             <span>Help Center</span>
@@ -41,7 +50,8 @@ const SupportInfo = () => {
 
           <button
             className={`sidebar-item ${activeTab === 'contact' ? 'active' : ''}`}
-            onClick={() => setActiveTab('contact')}
+            onClick={() => handleTabChange('contact')}
+            aria-current={activeTab === 'contact' ? 'page' : undefined}
           >
             <span className="icon">📧</span>
             <span>Contact Support</span>
@@ -49,7 +59,8 @@ const SupportInfo = () => {
 
           <button
             className={`sidebar-item ${activeTab === 'safety' ? 'active' : ''}`}
-            onClick={() => setActiveTab('safety')}
+            onClick={() => handleTabChange('safety')}
+            aria-current={activeTab === 'safety' ? 'page' : undefined}
           >
             <span className="icon">🛡️</span>
             <span>Safety Tips</span>
@@ -57,14 +68,15 @@ const SupportInfo = () => {
 
           <button
             className={`sidebar-item ${activeTab === 'terms' ? 'active' : ''}`}
-            onClick={() => setActiveTab('terms')}
+            onClick={() => handleTabChange('terms')}
+            aria-current={activeTab === 'terms' ? 'page' : undefined}
           >
             <span className="icon">📄</span>
             <span>Terms & Privacy</span>
           </button>
-        </div>
+        </nav>
 
-        <div className="settings-main">
+        <div className="settings-main page-transition">
           {renderContent()}
         </div>
       </div>

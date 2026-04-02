@@ -14,7 +14,7 @@ const AboutUs = () => {
       <section className="about-section hero-section">
         <div className="hero-image-wrapper">
           <img 
-            src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop" 
+            src="https://via.placeholder.com/1600x600/4ECDC4/FFFFFF?text=About+Us" 
             alt="Green forest and river" 
             className="hero-image"
           />
@@ -39,7 +39,7 @@ const AboutUs = () => {
           </div>
           <div className="about-image-block">
             <img 
-              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" 
+              src="https://via.placeholder.com/400x400/FF6B6B/FFFFFF?text=Our+Team" 
               alt="Modern architecture" 
               className="about-image"
               style={{ borderRadius: '12px' }}
@@ -77,7 +77,7 @@ const AboutUs = () => {
         <div className="alternate-content">
           <div className="alternate-image">
             <img 
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop" 
+              src="https://via.placeholder.com/300x300/45B7D1?text=Diversity" 
               alt="Diversity and inclusion" 
               className="alternate-img"
             />
@@ -103,7 +103,7 @@ const AboutUs = () => {
           </div>
           <div className="alternate-image">
             <img 
-              src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=600&auto=format&fit=crop" 
+              src="https://via.placeholder.com/300x300/A29BFE/FFFFFF?text=Sustainability" 
               alt="Sustainability" 
               className="alternate-img"
             />
@@ -116,7 +116,7 @@ const AboutUs = () => {
         <div className="alternate-content">
           <div className="alternate-image">
             <img 
-              src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=600&auto=format&fit=crop" 
+              src="https://via.placeholder.com/300x300/FFA07A/FFFFFF?text=Community" 
               alt="Community" 
               className="alternate-img"
             />
@@ -143,7 +143,7 @@ const AboutUs = () => {
           </div>
           <div className="alternate-image">
             <img 
-              src="https://images.unsplash.com/photo-1569098644584-210bcd375b59?q=80&w=600&auto=format&fit=crop" 
+              src="https://via.placeholder.com/300x300/98D8C8/FFFFFF?text=Citizen+Travelers" 
               alt="Citizen Travelers" 
               className="alternate-img"
             />
@@ -156,7 +156,7 @@ const AboutUs = () => {
         <div className="alternate-content">
           <div className="alternate-image">
             <img 
-              src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600&auto=format&fit=crop" 
+              src="https://via.placeholder.com/300x300/6C5CE7/FFFFFF?text=Careers"
               alt="Careers" 
               className="alternate-img"
             />

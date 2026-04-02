@@ -5,6 +5,31 @@ const User = require('../models/User');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+exports.createPaymentIntent = async (req, res, next) => {
+  try {
+    const { amount, currency } = req.body;
+    const normalizedCurrency = String(currency || '').toLowerCase();
+
+    if (!amount || typeof amount !== 'number' || amount <= 0) {
+      return res.status(400).json({ message: 'Invalid amount' });
+    }
+
+    if (!['usd', 'inr'].includes(normalizedCurrency)) {
+      return res.status(400).json({ message: 'Invalid currency' });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount),
+      currency: normalizedCurrency,
+      automatic_payment_methods: { enabled: true }
+    });
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const ensureCustomer = async (user) => {
   if (user.stripeCustomerId) return user.stripeCustomerId;
   const customer = await stripe.customers.create({

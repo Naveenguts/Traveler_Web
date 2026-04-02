@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import '../styles/Footer.css';
 
 const Footer = () => {
@@ -36,11 +38,11 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: 'f', url: 'https://facebook.com', label: 'Facebook' },
-    { icon: 'x', url: 'https://twitter.com', label: 'Twitter' },
-    { icon: '≡', url: '#', label: 'Menu' },
-    { icon: '▶', url: 'https://youtube.com', label: 'YouTube' },
-    { icon: 'in', url: 'https://linkedin.com', label: 'LinkedIn' },
+    { icon: FaFacebookF, url: 'https://facebook.com', label: 'Facebook' },
+    { icon: FaXTwitter, url: 'https://twitter.com', label: 'X (Twitter)' },
+    { icon: FaInstagram, url: 'https://instagram.com', label: 'Instagram' },
+    { icon: FaYoutube, url: 'https://youtube.com', label: 'YouTube' },
+    { icon: FaLinkedinIn, url: 'https://linkedin.com', label: 'LinkedIn' },
   ];
 
   return (
@@ -111,7 +113,9 @@ const Footer = () => {
             
             {/* Social Links */}
             <div className="social-links">
-              {socialLinks.map((social, index) => (
+              {socialLinks.map((social, index) => {
+                const Icon = social.icon;
+                return (
                 <a
                   key={index}
                   href={social.url}
@@ -121,9 +125,10 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {social.icon}
+                  <Icon className="social-icon-svg" aria-hidden="true" focusable="false" />
                 </a>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

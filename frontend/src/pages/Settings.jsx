@@ -23,7 +23,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="settings-page">
+    <div className="settings-page account-security-page">
       <div className="settings-header-main">
         <h1>Account & Settings</h1>
         <p>Manage your account, payment methods, preferences, and security</p>
@@ -64,7 +64,7 @@ const Settings = () => {
           </button>
         </div>
 
-        <div className="settings-main">
+        <div className="settings-main page-content" key={activeTab}>
           {renderContent()}
         </div>
       </div>
