@@ -1546,11 +1546,20 @@ const DestinationDetails = () => {
   return (
     <Elements stripe={stripePromise}>
       <div className="destination-details">
+        <nav className="destination-breadcrumb" aria-label="Breadcrumb">
+          <Link to="/">Home</Link>
+          <span>›</span>
+          <Link to="/destinations">Inspiration for your {displayDestination.country} trip</Link>
+          <span>›</span>
+          <span className="current">Why {displayDestination.name} is the best place to visit</span>
+        </nav>
+
         <section className="destination-hero">
           <div className="destination-hero-header">
             <div>
               <h1>{displayDestination.name}</h1>
               <p className="destination-country">{displayDestination.country}</p>
+              <p className="destination-hero-summary">{aboutDescription}</p>
             </div>
             <div className="destination-hero-tags">
               <span className="hero-tag">{displayDestination.duration} days</span>

@@ -450,3 +450,165 @@
     font-size: 3rem;
   }
 }
+
+@media (max-width: 768px) {
+  .my-trips-page {
+    max-width: 100%;
+    padding: 12px;
+    background: linear-gradient(180deg, #edf4ff 0%, #f8fafc 40%, #f5f7fb 100%);
+  }
+
+  .trips-header {
+    margin-bottom: 20px;
+  }
+
+  .trips-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 14px;
+    line-height: 1.15;
+  }
+
+  .trip-filters {
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    flex-wrap: nowrap;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .trip-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .trips-container {
+    margin-top: 18px;
+  }
+
+  .trips-section {
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+  }
+
+  .trips-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .trip-card {
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+  }
+
+  .trip-card-image {
+    height: 190px;
+  }
+
+  .trip-status {
+    top: 12px;
+    right: 12px;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .trip-card-content {
+    padding: 16px;
+  }
+
+  .trip-header {
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .trip-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .trip-country,
+  .trip-dates,
+  .trip-description {
+    font-size: 0.92rem;
+  }
+
+  .trip-actions {
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .trip-actions button {
+    min-height: 44px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+  }
+
+  .empty-state {
+    padding: 34px 16px;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  }
+
+  .empty-state h2 {
+    font-size: 1.2rem;
+  }
+
+  .empty-state p {
+    font-size: 0.95rem;
+  }
+
+  .btn-explore {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-trips-page {
+    padding: 10px;
+  }
+
+  .trips-header h1 {
+    font-size: 1.55rem;
+  }
+
+  .filter-btn {
+    font-size: 0.8rem;
+    padding: 9px 12px;
+  }
+
+  .trip-card-image {
+    height: 170px;
+  }
+
+  .trip-card-content {
+    padding: 14px;
+  }
+
+  .trip-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .trip-actions button {
+    min-height: 44px;
+  }
+
+  .empty-state {
+    padding: 28px 14px;
+  }
+}

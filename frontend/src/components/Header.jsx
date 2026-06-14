@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const NotificationBell = () => {
@@ -139,19 +139,44 @@ const ProfileDropdown = () => {
 
 const Header = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  const handleNavLinkClick = () => setIsMobileMenuOpen(false);
 
   return (
     <header className="header">
       <div className="header-left">
-        <Link to="/" className="header-logo-link">
+        <Link to="/" className="header-logo-link" onClick={handleNavLinkClick}>
           <img src="/assets/favicon.svg" alt="Traveler Logo" className="header-logo" />
           <h1>Traveler</h1>
         </Link>
-        <nav className="main-nav">
-          <Link to="/">Home</Link>
-          <Link to="/destinations">Destinations</Link>
-          <Link to="/map">Map</Link>
-          <Link to="/explore">Explore</Link>
+
+        <button
+          type="button"
+          className={`mobile-menu-toggle ${isMobileMenuOpen ? 'is-open' : ''}`}
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="main-navigation"
+        >
+          <span className="menu-bar" />
+          <span className="menu-bar" />
+          <span className="menu-bar" />
+        </button>
+
+        <nav
+          id="main-navigation"
+          className={`main-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}
+        >
+          <Link to="/" onClick={handleNavLinkClick}>Home</Link>
+          <Link to="/destinations" onClick={handleNavLinkClick}>Destinations</Link>
+          <Link to="/map" onClick={handleNavLinkClick}>Map</Link>
+          <Link to="/explore" onClick={handleNavLinkClick}>Explore</Link>
         </nav>
       </div>
       <div className="header-right">

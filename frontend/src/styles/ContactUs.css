@@ -315,3 +315,164 @@
     width: 100%;
   }
 }
+
+@media (max-width: 768px) {
+  .contact-page {
+    background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 42%, #f5f7fb 100%);
+    padding-bottom: 42px;
+  }
+
+  .contact-hero {
+    padding: 48px 16px 40px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+  }
+
+  .contact-hero h1 {
+    font-size: 2.15rem;
+    line-height: 1.08;
+    max-width: 12ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contact-hero p {
+    font-size: 0.98rem;
+    line-height: 1.55;
+    max-width: 34ch;
+    margin: 0 auto;
+  }
+
+  .contact-container {
+    padding: 20px 12px 0;
+    gap: 18px;
+  }
+
+  .contact-methods {
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+
+  .contact-method-card,
+  .contact-form-section,
+  .contact-faq-section {
+    border-radius: 20px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+  }
+
+  .contact-method-card {
+    padding: 22px 18px;
+  }
+
+  .method-icon {
+    font-size: 34px;
+    margin-bottom: 12px;
+  }
+
+  .contact-method-card h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .method-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .method-details {
+    font-size: 0.92rem;
+  }
+
+  .contact-form-section {
+    padding: 22px 18px;
+  }
+
+  .contact-form-section h2,
+  .contact-faq-section h2 {
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+  }
+
+  .contact-form {
+    gap: 14px;
+  }
+
+  .form-group label {
+    font-size: 0.92rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    min-height: 46px;
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+
+  .form-group textarea {
+    min-height: 140px;
+  }
+
+  .submit-button {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 12px;
+    margin-top: 4px;
+  }
+
+  .contact-faq-section {
+    margin: 0 0 44px;
+    padding: 22px 18px;
+  }
+
+  .contact-faq-section p {
+    font-size: 0.93rem;
+    line-height: 1.55;
+  }
+
+  .contact-faq-buttons {
+    gap: 10px;
+  }
+
+  .contact-button {
+    min-height: 44px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-page {
+    padding-bottom: 32px;
+  }
+
+  .contact-hero {
+    padding: 42px 14px 34px;
+  }
+
+  .contact-hero h1 {
+    font-size: 1.9rem;
+  }
+
+  .contact-container {
+    padding: 16px 10px 0;
+  }
+
+  .contact-method-card,
+  .contact-form-section,
+  .contact-faq-section {
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+
+  .method-icon {
+    font-size: 30px;
+  }
+
+  .submit-button,
+  .contact-button {
+    min-height: 44px;
+  }
+}

@@ -757,3 +757,253 @@
     font-size: 14px;
   }
 }
+
+@media (max-width: 768px) {
+  .activity-detail-container {
+    background: linear-gradient(180deg, #edf4ff 0%, #f8fafc 34%, #f5f7fb 100%);
+  }
+
+  .gallery-section,
+  .activity-content {
+    border-radius: 20px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+  }
+
+  .gallery-section {
+    margin-bottom: 16px;
+  }
+
+  .main-image-wrapper {
+    height: 320px;
+  }
+
+  .gallery-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 22px;
+  }
+
+  .image-counter {
+    bottom: 12px;
+    right: 12px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .thumbnails {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .thumbnail {
+    width: 68px;
+    height: 68px;
+    border-radius: 10px;
+  }
+
+  .activity-content {
+    padding: 18px 16px;
+  }
+
+  .activity-header {
+    flex-direction: column;
+    gap: 0.85rem;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+  }
+
+  .activity-title {
+    font-size: 1.7rem;
+    line-height: 1.1;
+  }
+
+  .activity-meta {
+    gap: 0.5rem;
+  }
+
+  .location {
+    font-size: 0.95rem;
+  }
+
+  .category {
+    font-size: 0.78rem;
+    padding: 0.38rem 0.65rem;
+  }
+
+  .rating-section {
+    text-align: left;
+    width: 100%;
+  }
+
+  .rating-badge {
+    align-items: flex-start;
+  }
+
+  .stars {
+    font-size: 1.15rem;
+  }
+
+  .review-count {
+    font-size: 0.85rem;
+  }
+
+  .quick-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 18px;
+    padding: 0 0 16px;
+  }
+
+  .info-item {
+    padding: 0.8rem 0.85rem;
+    background: #f8fafc;
+    border-radius: 14px;
+    font-size: 0.92rem;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .left-column {
+    gap: 14px;
+  }
+
+  .description-section,
+  .section-box,
+  .pricing-card,
+  .provider-section {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .description-section h3,
+  .section-box h3,
+  .pricing-card h3,
+  .provider-section h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .short-description,
+  .full-description,
+  .provider-info,
+  .highlights-list,
+  .includes-list,
+  .excludes-list,
+  .items-list,
+  .price-summary {
+    font-size: 0.93rem;
+    line-height: 1.65;
+  }
+
+  .highlights-list li,
+  .includes-list li,
+  .excludes-list li,
+  .items-list li {
+    padding: 0.55rem 0;
+  }
+
+  .right-column {
+    margin-top: 2px;
+  }
+
+  .pricing-card {
+    position: static;
+    top: auto;
+  }
+
+  .price-display {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .price-main .amount {
+    font-size: 2rem;
+  }
+
+  .booking-form {
+    gap: 0.8rem;
+  }
+
+  .guest-selector {
+    min-height: 46px;
+    border-radius: 12px;
+  }
+
+  .btn-adjust {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+
+  .summary-row {
+    font-size: 0.92rem;
+  }
+
+  .btn-reserve,
+  .btn-pay-later {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+  }
+
+  .trust-badges {
+    gap: 0.6rem;
+  }
+
+  .badge {
+    padding: 0.7rem 0.8rem;
+    border-radius: 14px;
+    font-size: 0.8rem;
+  }
+
+  .btn-back {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .activity-detail-container {
+    padding: 8px;
+  }
+
+  .main-image-wrapper {
+    height: 250px;
+  }
+
+  .thumbnail {
+    width: 58px;
+    height: 58px;
+  }
+
+  .activity-content {
+    padding: 15px 12px;
+  }
+
+  .activity-title {
+    font-size: 1.45rem;
+  }
+
+  .quick-info {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  .price-main .amount {
+    font-size: 1.75rem;
+  }
+}

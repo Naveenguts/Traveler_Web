@@ -245,62 +245,89 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .activity-card {
-    border-radius: 8px;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
   }
 
   .activity-card-image {
-    height: 160px;
+    height: 190px;
   }
 
   .activity-card-content {
-    padding: 12px;
-    gap: 8px;
+    padding: 14px;
+    gap: 7px;
   }
 
   .activity-card-title {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .activity-location {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .activity-description {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .btn-view-details {
-    padding: 6px 12px;
-    font-size: 11px;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 10px;
   }
 
   .price-current {
-    font-size: 16px;
+    font-size: 17px;
+  }
+
+  .activity-meta-info {
+    gap: 8px;
+  }
+
+  .activity-features {
+    gap: 5px;
+    padding: 7px 0;
+  }
+
+  .activity-footer {
+    gap: 10px;
   }
 }
 
 @media (max-width: 480px) {
+  .activity-card {
+    border-radius: 18px;
+  }
+
   .activity-card-image {
-    height: 140px;
+    height: 175px;
   }
 
   .activity-card-content {
-    padding: 10px;
+    padding: 12px;
     gap: 6px;
   }
 
   .activity-footer {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .btn-view-details {
     width: 100%;
-    padding: 8px 12px;
+    min-height: 44px;
   }
 
   .activity-price {
     align-items: stretch;
+  }
+
+  .discount-badge,
+  .rating-badge-card,
+  .free-cancel-badge {
+    padding: 5px 9px;
+    font-size: 11px;
   }
 }
