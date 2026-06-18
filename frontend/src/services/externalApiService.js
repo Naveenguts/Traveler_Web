@@ -401,6 +401,24 @@ export const externalAPI = {
     } catch (error) {
       return null;
     }
+  },
+
+  // Get Overpass OSM places
+  getOverpassPlaces: async (query) => {
+    try {
+      const response = await fetch(`${API_URL}/external/overpass`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query })
+      });
+      if (!response.ok) throw new Error('Failed to fetch overpass places');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in getOverpassPlaces:', error);
+      throw error;
+    }
   }
 };
 

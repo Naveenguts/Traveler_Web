@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { externalAPI } from '../services/externalApiService';
 import '../styles/Explore.css';
 
 const centerDefault = { lat: 12.9716, lng: 77.5946 };
-const overpassUrl = 'https://overpass-api.de/api/interpreter';
 
 const ExploreCategories = [
   { value: 'restaurant', label: '🍴 Restaurants', icon: '🍴' },
@@ -123,11 +123,7 @@ const Explore = () => {
       out 100;
     `;
 
-    fetch(overpassUrl, {
-      method: 'POST',
-      body: query,
-    })
-      .then((res) => res.json())
+    externalAPI.getOverpassPlaces(query)
       .then((data) => {
         const places = data.elements || [];
         const placesData = places.slice(0, 15).map((place) => {

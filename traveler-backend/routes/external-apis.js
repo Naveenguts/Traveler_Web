@@ -31,6 +31,10 @@ const wikipediaImageCache = new Map();
 const WIKIPEDIA_IMAGE_CACHE_TTL = 1000 * 60 * 60 * 24 * 7; // 7 days
 const WIKIPEDIA_USER_AGENT = 'TravelerProject/1.0 (travel-app image proxy; contact: support@traveler.local)';
 
+// Overpass OSM places cache
+const overpassCache = new Map();
+const OVERPASS_CACHE_TTL = 1000 * 60 * 60 * 2; // 2 hours
+
 const normalizeWikiTitle = (title = '') => String(title).trim().replace(/\s+/g, '_');
 
 const getWikipediaImage = async (title, thumbSize = 800) => {
@@ -1199,6 +1203,55 @@ router.get('/weather/:city', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch weather information',
+      error: error.message
+    });
+  }
+});
+
+// Overpass API Proxy Route
+router.post('/overpass', async (req, res) => {
+  try {
+    const { query } = req.body;
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing query in request body'
+      });
+    }
+
+    const now = Date.now();
+    const cached = overpassCache.get(query);
+
+    if (cached && now - cached.fetchedAt < OVERPASS_CACHE_TTL) {
+      console.log('✓ Overpass query returned from cache');
+      return res.json(cached.data);
+    }
+
+    console.log('⟳ Fetching Overpass API (proxying request)...');
+    const response = await axios.post(
+      'https://overpass-api.de/api/interpreter',
+      'data=' + encodeURIComponent(query),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'TravelerApp/1.0 (contact@traveler.local)'
+        },
+        timeout: 20000
+      }
+    );
+
+    // Cache the response
+    overpassCache.set(query, {
+      data: response.data,
+      fetchedAt: now
+    });
+
+    return res.json(response.data);
+  } catch (error) {
+    console.error('Error in Overpass proxy route:', error.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch places from Overpass API',
       error: error.message
     });
   }
