@@ -10204,3 +10204,31 @@ body[data-support-theme="dark"] {
     border-radius: 16px;
   }
 }
+
+/* Cancel button in Booking Modal */
+.modal-actions .btn.btn-secondary {
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
+  border: 2px solid #fecaca !important;
+  font-weight: 700 !important;
+}
+
+.modal-actions .btn.btn-secondary:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Back to Booking button in Payment Modal */
+.payment-actions .btn.btn-secondary {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  border: 2px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+}
+
+.payment-actions .btn.btn-secondary:hover {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+}

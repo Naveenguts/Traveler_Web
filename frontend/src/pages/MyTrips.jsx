@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { destinationsDataBase } from './Destinations';
 import '../styles/MyTrips.css';
 
 const MyTrips = () => {
@@ -25,9 +26,20 @@ const MyTrips = () => {
   };
 
   const handleViewDetails = (tripId) => {
-    // Navigate to trip details page
-    console.log('View details for trip:', tripId);
-    // navigate(`/trips/${tripId}`);
+    const trip = trips.find(t => t._id === tripId);
+    if (!trip) return;
+
+    // Find the destination by name to get its ID
+    const destination = destinationsDataBase.find(
+      d => d.name.toLowerCase() === trip.destinationName.toLowerCase()
+    );
+
+    if (destination) {
+      navigate(`/destinations/${destination.id}`);
+    } else {
+      // Fallback: If not found in static list, try destinations list page
+      navigate('/destinations');
+    }
   };
 
   const handleDownloadItinerary = (tripId) => {
